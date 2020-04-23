@@ -1,4 +1,5 @@
 import os
+import glob
 import shutil
 import json
 import uuid
@@ -44,6 +45,16 @@ def getDirectoryExtensionFilesRecursive(path, extension):
 
 	return fileList
 
+def getSubDirectoriesContainingFileType(path, extension):
+	os.chdir(path)
+	fileFormat = '**/*.{}'.format(extension)
+	files = glob.glob(fileFormat, recursive = True)
+
+	matchingDirs = []
+	for file in files:
+		matchingDirs.append(os.path.dirname(os.path.abspath(file)))
+	
+	return matchingDirs
 
 def getSubDirectories(path):
 	dirList = []

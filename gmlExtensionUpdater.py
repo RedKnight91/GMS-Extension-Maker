@@ -19,14 +19,13 @@ def projectUsesExtension(project, extensionName):
 	hasMatchingExtensionDir = (os.path.exists(projectExtensionPath))
 
 	if (hasMatchingExtensionDir):
-		foundLogStr = 'Found project using {} extension: {}'.format(extensionName, project)
-		print(foundLogStr)
+		print('Project match: {}'.format(project))
 		return True
 
 	return False
 
 def listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName):
-	projectDirs = listProjectDirectories(projectsDir)
+	projectDirs = utils.getSubDirectoriesContainingFileType(projectsDir, 'yyp')
 	matchingProjects = []
 
 	for project in projectDirs:
@@ -39,8 +38,16 @@ def listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName):
 
 	return matchingProjects
 
+def promptExtensionUpdateType(extensionDirs, extensionFiles):
+	prompt = 'Update all projects at once? (Y/N)'
+	updateAll = utils.promptChoice(prompt)
+
+	for extensionDir in extensionDirs:
+		if (updateAll or confirmExtensionUpdate(extensionDir)):
+			utils.replaceDirFiles(extensionDir, extensionFiles)
+
 def confirmExtensionUpdate(dir):
-	prompt = 'Update this extension (Y/N)? {}'.format(dir)
+	prompt = 'Update this extension? (Y/N) {}'.format(dir)
 	return utils.promptChoice(prompt)
 
 #Pushes an updated extension to all the projects which use it
@@ -55,15 +62,13 @@ def pushExtension(extPaths):
 	print('[1/3] Finding extension files\n')
 	extensionFiles = getUpToDateExtensionFiles(extensionDir)
 
-	print('[2/3] Looking for projects using extension')
+	print('[2/3] Looking for projects using {} extension'.format(extensionName))
 	matchingExtensionDirs = listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName)
 
 	if (len(matchingExtensionDirs) == 0):
 		print('\n[3/3] No projects found')
 	else:
 		print('\n[3/3] Pushing extension to projects')
-		for extensionDir in matchingExtensionDirs:
-			if (confirmExtensionUpdate(extensionDir)):
-				utils.replaceDirFiles(extensionDir, extensionFiles)
+		promptExtensionUpdateType(matchingExtensionDirs, extensionFiles)
 
 	print('\nUPDATE COMPLETED\n')
