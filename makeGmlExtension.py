@@ -1,12 +1,28 @@
 from gmlExtensionMaker import makeExtension
 
-extPaths = {}
+class Paths:
+	pass
 
-extPaths['projectDirName']			= 'GMS_utilities'
-extPaths['extensionProjectDirName']	= extPaths['projectDirName'] + '_extension'
-extPaths['extensionName']			= extPaths['projectDirName']
+inputPaths = Paths()
 
-extPaths['projectsDir']				= r'C:\Users\mikec\Documents\GameMakerStudio2'
-extPaths['extensionsSubDir']		= r'__MY ASSETS'
+inputPaths.sourceProjectName	= 'Tool'
+inputPaths.extensionProjectName	= inputPaths.sourceProjectName + '_extension'
+inputPaths.extensionName		= inputPaths.sourceProjectName
 
-makeExtension(extPaths)
+inputPaths.projectsDir			= r'C:\Users\mikec\Desktop\Fake Projects'
+inputPaths.extensionsSubDir		= ''
+
+inputPaths.externalResourcesGroup = 'External'
+inputPaths.internalResourcesGroup = 'Internal'
+
+# inputPaths.sourceProjectName	= 'GMS_utilities'
+# inputPaths.extensionProjectName	= inputPaths.sourceProjectName + '_extension'
+# inputPaths.extensionName		= inputPaths.sourceProjectName
+
+# inputPaths.projectsDir			= 'C:/Users/mikec/Documents/GameMakerStudio2'
+# inputPaths.extensionsSubDir		= '__MY ASSETS'
+
+# inputPaths.externalResourcesGroup = 'External'
+# inputPaths.internalResourcesGroup = 'Internal'
+
+makeExtension(inputPaths)

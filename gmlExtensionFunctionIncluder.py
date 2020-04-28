@@ -1,22 +1,22 @@
-import utilityScripts as utils
+import utilities as utils
 
 def createFunctionFileJson(file):
-	json = {}
-
-	json['id'] = str(utils.makeUuidV4())
-	json['modelName'] = 'GMExtensionFile'
-	json['mvc'] = '1.0'
-	json['ProxyFiles'] = []
-	json['constants'] = []
-	json['copyToTargets'] = -1
-	json['filename'] = utils.getFileName(file)
-	json['final'] = ''
-	json['functions'] = []
-	json['init'] = ''
-	json['kind'] = 2
-	json['order'] = []
-	json['origname'] = ''
-	json['uncompress'] = 'false'
+	json = {
+		'id'			: str(utils.makeUuidV4()),
+		'modelName'		: 'GMExtensionFile',
+		'mvc'			: '1.0',
+		'ProxyFiles' 	: [],
+		'constants'		: [],
+		'copyToTargets'	: -1,
+		'filename'		: utils.getFileName(file, False),
+		'final'			: '',
+		'functions'		: [],
+		'init'			: '',
+		'kind'			: 2,
+		'order'			: [],
+		'origname'		: '',
+		'uncompress'	: 'false'
+	}
 
 	return json
 
@@ -31,11 +31,11 @@ def createFunctionFilesJson(extensionDir):
 
 	return filesJson
 
-def includeFunctionFilesToExtension(extPaths):
+def includeFunctionFilesToExtension(workPaths):
 	print('\nINCLUDE FUNCTION FILES \n')
 
-	extensionDir = extPaths['extensionDir']
-	extensionFile = extPaths['extensionFile']
+	extensionDir = workPaths.extension.dir
+	extensionFile = workPaths.extension.file
 
 	print('[1/2] Creating files JSON')
 	filesJson = createFunctionFilesJson(extensionDir)

@@ -1,5 +1,5 @@
 import os
-import utilityScripts as utils
+import utilities as utils
 
 def getUpToDateExtensionFiles(extensionDir):
 	return utils.getDirectoryFiles(extensionDir)
@@ -51,13 +51,13 @@ def confirmExtensionUpdate(dir):
 	return utils.promptChoice(prompt)
 
 #Pushes an updated extension to all the projects which use it
-def pushExtension(extPaths):
+def pushExtension(workPaths):
 	print('\nPUSHING EXTENSION\n')
 
-	projectsDir = extPaths['projectsDir']
-	extensionProjectDir = extPaths['extensionProjectDir']
-	extensionName = extPaths['extensionName']
-	extensionDir = extPaths['extensionDir']
+	projectsDir = workPaths['projectsDir']
+	extensionProjectDir = workPaths['extensionProjectDir']
+	extensionName = workPaths['extensionName']
+	extensionDir = workPaths['extensionDir']
 
 	print('[1/3] Finding extension files\n')
 	extensionFiles = getUpToDateExtensionFiles(extensionDir)

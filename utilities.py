@@ -4,6 +4,24 @@ import shutil
 import json
 import uuid
 
+def replaceExtension(path, extension):
+	noExtPath = os.path.splitext(path)[0]
+	newExtPath = noExtPath + '.' + extension
+	return newExtPath
+
+def removeFileNameExtension(name):
+	name = os.path.splitext(name)[0]
+	return name
+
+def extractFileNames(paths, excludeExtension):
+	names = []
+
+	for path in paths:
+		name = getFileName(path, excludeExtension)
+		names.append(name)
+
+	return names
+
 def getDirectoryFiles(path):
 	fileList = []
 	dirContent = next(os.walk(path))
@@ -116,21 +134,40 @@ def deleteDirectoryFiles(dir):
 		childPath = os.path.join(dir, child)
 		os.remove(childPath)
 
+def copyDirectoriesToDir(dirs, dest):
+	for dir in dirs:
+		if (not os.path.exists(dir)):
+			shutil.copy(dir, dest)
 
-def copyFilesToDirectory(files, dir):
+def copyFilesToDir(files, dir):
 	for file in files:
-		shutil.copy(file, dir)
+		newPath = os.path.join(dir, os.path.basename(file))
+		if (not os.path.exists(newPath)):
+			shutil.copy(file, dir)
 
+def replaceDirectoriesToDir(dirs, dest):
+	for dir in dirs:
+		shutil.copy(dir, dest)
+
+def replaceFilesToDir(files, dir):
+	for file in files:
+		print('file: ', file)
+		shutil.copy(file, dir)
 
 def replaceDirFiles(dir, files):
 	deleteDirectoryFiles(dir)
-	copyFilesToDirectory(files, dir)
+	copyFilesToDir(files, dir)
 
-def getFileName(path):
-	return os.path.basename(path)
+def getFileName(path, removeExtension):
+	name = os.path.basename(path)
+	if (removeExtension):
+		name = removeFileNameExtension(name)
+
+	return name
 
 def getDirName(path):
-	return os.path.basename(path)
+	name = os.path.basename(path)
+	return name
 
 def getLinesContainingString(filePath, string):
 	matches = []
@@ -141,6 +178,10 @@ def getLinesContainingString(filePath, string):
 				matches.append(line)
 
 	return matches
+
+def writeFile(filePath, content):
+	with open(filePath, 'w') as file:
+		file.write(content)
 
 def readFileJson(filePath):
 	with open(filePath, 'r') as file:
@@ -166,6 +207,12 @@ def promptChoice(prompt):
 	choice = input()
 
 	return (choice.upper() == 'Y')
+
+def printList(list):
+	print('[')
+	for item in list:
+		print('    {},'.format(item))
+	print(']')
 
 def makeUuidV4():
 	return uuid.uuid4()

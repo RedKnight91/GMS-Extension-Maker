@@ -1,9 +1,13 @@
 import os
 import json
-import utilityScripts as utils
-from gmlExtensionJsdocInjector import injectExtensionJsdocs
+import utilities as utils
 
 validParamTags = ['@param', '@arg', '@argument']
+
+def makeScriptFilePath(scriptDir):
+	dirName = os.path.basename(scriptDir)
+	script = os.path.join(scriptDir, dirName) + '.gml'
+	return script
 
 def parseScriptName(filePath):
 	scriptName = os.path.basename(filePath)
@@ -94,7 +98,7 @@ def generateFunctionJsdoc(filePath, arguments):
 	return jsdocFuncLine
 
 
-def combineScripts(scripts, jsdocs):
+def combineFunctions(scripts, jsdocs):
 	combinedFunctions = ''
 
 	for scriptPath in scripts:
@@ -111,15 +115,14 @@ def combineJsdocs(scripts):
 
 	for scriptPath in scripts:
 		with open(scriptPath, 'r') as script:
-			scriptName = parseScriptName(scriptPath)
 			arguments = generateFunctionArgList(script)
-			jsdocFuncLine = generateFunctionJsdoc(scriptPath, arguments)
+			functionJsdoc = {
+				'arguments' : arguments,
+				'helpLine' : generateFunctionJsdoc(scriptPath, arguments)
+			}
 
-			functionJsdoc = {}
-			functionJsdoc['arguments'] = arguments
-			functionJsdoc['helpLine'] = jsdocFuncLine
-
-			combinedJsdocs[scriptName] = functionJsdoc
+		scriptName = parseScriptName(scriptPath)
+		combinedJsdocs[scriptName] = functionJsdoc
 
 	return combinedJsdocs
 
@@ -129,31 +132,27 @@ def writeCombinedFiles(jsdocs, functions, combinedFilesDir, functionsFilePath, j
 		os.mkdir(combinedFilesDir)
 
 	print('Writing {}'.format(functionsFilePath))
-	with open(functionsFilePath, 'w') as combinedFile:
-		combinedFile.write(functions)
+	utils.writeFile(functionsFilePath, functions)
 
 	print('Writing {}'.format(jsdocFilePath))
-	with open(jsdocFilePath, 'w') as jsdocFile:
-		json.dump(jsdocs, jsdocFile)
+	utils.writeFileJson(jsdocFilePath, jsdocs)
 
 
-def combineGmlScripts(extPaths):
+def combineScripts(workPaths, scriptDirs):
 	print('\nCOMBINE SCRIPTS\n')
-	
-	scriptsDir = extPaths['scriptsDir']
-	combinedFilesDir = extPaths['combinedFilesDir']
-	functionsFilePath = extPaths['combinedFunctionsFile']
-	jsdocFilePath = extPaths['combinedJsdocFile']
 
-	print('[1/3] Finding scripts')
-	scripts = utils.getDirectoryExtensionFilesRecursive(scriptsDir, '.gml')
-	
-	print('[2/3] Combining scripts, combining jsdocs')
-	combinedJsdocs = combineJsdocs(scripts)
-	combinedFunctions = combineScripts(scripts, combinedJsdocs)
+	combinedDir	= workPaths.combinedFunctions.dir
+	functionsFile = workPaths.combinedFunctions.file
+	jsdocFile = workPaths.combinedJsdocs.file
 
-	print('[3/3] Writing files')
-	writeCombinedFiles(combinedJsdocs, combinedFunctions, combinedFilesDir, functionsFilePath, jsdocFilePath)
+	scripts = [makeScriptFilePath(scriptDir) for scriptDir in scriptDirs]
+
+	print('[1/2] Combining scripts, combining jsdocs')
+	combinedJsdocs		= combineJsdocs(scripts)
+	combinedFunctions	= combineFunctions(scripts, combinedJsdocs)
+
+	print('[2/2] Writing files')
+	writeCombinedFiles(combinedJsdocs, combinedFunctions, combinedDir, functionsFile, jsdocFile)
 
 	
 

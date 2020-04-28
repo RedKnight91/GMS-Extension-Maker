@@ -1,16 +1,29 @@
-import utilityScripts as utils
+import utilities as utils
 
-def copyCombinedFilesToExtensionDir(extPaths):
-	print('\nCOPY FILE\n')
+def copyFunctionsFileToExtensionDir(workPaths):
+	print('\nCOPYING FUNCTIONS FILE\n')
 
-	extensionDir = extPaths['extensionDir']
-	functionsFile = extPaths['combinedFunctionsFile']
+	extensionDir = workPaths.extension.dir
 
-	prompt = 'Would you like to copy the combined files to the extension folder? (Y/N)\n {}'.format(extensionDir)
+	prompt = 'Would you like to copy the combined functions file to the extension folder? (Y/N)\n {}'.format(extensionDir)
 	confirmed = utils.promptChoice(prompt)
 
 	if (confirmed):
-		files = [functionsFile]
-		utils.copyFilesToDirectory(files, extensionDir)
+		functions = [workPaths.combinedFunctions.file]
+		utils.replaceFilesToDir(functions, extensionDir)
 
 	print('\nFUNCTIONS FILE COPIED\n')
+
+
+def copyExternalResourcesToExtensionDir(resourceDir, externalResources):
+	print('\nCOPYING EXTERNAL RESOURCES\n')
+
+	prompt = 'Copy external resources to this folder? (Y/N)\n{}'.format(resourceDir)
+	confirmed = utils.promptChoice(prompt)
+
+	if (confirmed):
+		utils.replaceDirectoriesToDir(externalResources, resourceDir)
+
+	#TODO Include files in project .yyp
+
+	print('\nRESOURCE DIRECTORIES COPIED\n')
