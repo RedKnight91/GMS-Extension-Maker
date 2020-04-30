@@ -1,25 +1,5 @@
 import os
-
-class File:
-	def __init__(self, name, dir, extension):
-		self.name	= name
-		self.dir	= dir
-		self.file	= os.path.join(dir, name) + '.' + extension
-
-	def __str__(self):
-		return 'name: {},\ndir : {},\nfile: {}\n'.format(self.name, self.dir, self.file)
-
-class Project(File):
-	def __init__(self, name, dir, extension):
-		File.__init__(self, name, dir, extension)
-		self.scriptsDir		= os.path.join(dir, 'scripts')
-		self.objectsDir		= os.path.join(dir, 'objects')
-		self.viewsDir		= os.path.join(dir, 'views')
-		self.extensionsDir	= os.path.join(dir, 'extensions')
-
-	def __str__(self):
-		output = File.__str__(self)
-		return output + 'scriptsDir: {},\nobjectsDir: {},\nviewsDir: {},\nextensionsDir: {}'.format(self.scriptsDir, self.objectsDir, self.viewsDir, self.extensionsDir)
+from gmsUtilities import Project, File
 
 def printWorkPaths(workPaths):
 	print('WORK PATHS:\n')
@@ -50,9 +30,9 @@ def initExtensionPaths(paths):
 		pass
 
 	workPaths = Paths()
-	
-	workPaths.sourceProject			= Project(paths.sourceProjectName, sourceProjectDir, 'yyp')
-	workPaths.extensionProject		= Project(paths.extensionProjectName, extensionProjectDir, 'yyp')
+	workPaths.projectsDir			= paths.projectsDir
+	workPaths.sourceProject			= Project(paths.sourceProjectName, sourceProjectDir)
+	workPaths.extensionProject		= Project(paths.extensionProjectName, extensionProjectDir)
 
 	extensionDir					= os.path.join(workPaths.extensionProject.extensionsDir, paths.extensionName)
 	workPaths.extension				= File(paths.extensionName, extensionDir, 'yy')

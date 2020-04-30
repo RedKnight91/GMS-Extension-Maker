@@ -1,4 +1,6 @@
 import utilities as utils
+import gmsUtilities as gms
+import os
 
 def copyFunctionsFileToExtensionDir(workPaths):
 	print('\nCOPYING FUNCTIONS FILE\n')
@@ -15,7 +17,15 @@ def copyFunctionsFileToExtensionDir(workPaths):
 	print('\nFUNCTIONS FILE COPIED\n')
 
 
-def copyExternalResourcesToExtensionDir(resourceDir, externalResources):
+
+def copyExternalScriptsToExtensionDir(workPaths, externalScriptDirs):
+	copyExternalResourcesToExtensionDir(workPaths, 'GMScript', 'ResourceTree_Scripts', workPaths.extensionProject.scriptsDir, externalScriptDirs)
+
+def copyExternalObjectsToExtensionDir(workPaths, externalObjectDirs):
+	copyExternalResourcesToExtensionDir(workPaths, 'GMObject', 'ResourceTree_Objects', workPaths.extensionProject.objectsDir, externalObjectDirs)
+
+
+def copyExternalResourcesToExtensionDir(workPaths, filterType, resourceType, resourceDir, externalResources):
 	print('\nCOPYING EXTERNAL RESOURCES\n')
 
 	prompt = 'Copy external resources to this folder? (Y/N)\n{}'.format(resourceDir)
@@ -23,7 +33,9 @@ def copyExternalResourcesToExtensionDir(resourceDir, externalResources):
 
 	if (confirmed):
 		utils.replaceDirectoriesToDir(externalResources, resourceDir)
+		projectFile = workPaths.extensionProject.file
 
-	#TODO Include files in project .yyp
+		newResourceUuids = gms.includeResourcesToProject(externalResources, projectFile, filterType)
+		gms.addResourcesToRootView(newResourceUuids, filterType, resourceType, workPaths)
 
 	print('\nRESOURCE DIRECTORIES COPIED\n')

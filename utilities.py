@@ -4,14 +4,14 @@ import shutil
 import json
 import uuid
 
-def replaceExtension(path, extension):
-	noExtPath = os.path.splitext(path)[0]
-	newExtPath = noExtPath + '.' + extension
-	return newExtPath
+def makeFilePath(dir, name, extension):
+	path = os.path.join(dir, name) + '.' + extension
+	return path
 
-def removeFileNameExtension(name):
-	name = os.path.splitext(name)[0]
-	return name
+
+def makeFilePathList(dir, names, extension):
+	paths = [makeFilePath(dir, name, extension) for name in names]
+	return paths
 
 def extractFileNames(paths, excludeExtension):
 	names = []
@@ -21,6 +21,15 @@ def extractFileNames(paths, excludeExtension):
 		names.append(name)
 
 	return names
+
+def replaceExtension(path, extension):
+	noExtPath = os.path.splitext(path)[0]
+	newExtPath = noExtPath + '.' + extension
+	return newExtPath
+
+def removeExtension(name):
+	name = os.path.splitext(name)[0]
+	return name
 
 def getDirectoryFiles(path):
 	fileList = []
@@ -137,7 +146,9 @@ def deleteDirectoryFiles(dir):
 def copyDirectoriesToDir(dirs, dest):
 	for dir in dirs:
 		if (not os.path.exists(dir)):
-			shutil.copy(dir, dest)
+			dirName = os.path.basename(dir)
+			fullDest = os.path.join(dest, dirName)
+			shutil.copytree(dir, fullDest)
 
 def copyFilesToDir(files, dir):
 	for file in files:
@@ -147,27 +158,41 @@ def copyFilesToDir(files, dir):
 
 def replaceDirectoriesToDir(dirs, dest):
 	for dir in dirs:
-		shutil.copy(dir, dest)
+		dirName = os.path.basename(dir)
+		fullDest = os.path.join(dest, dirName)
+
+		if os.path.exists(fullDest):
+			shutil.rmtree(fullDest)
+
+		shutil.copytree(dir, fullDest)
 
 def replaceFilesToDir(files, dir):
 	for file in files:
-		print('file: ', file)
 		shutil.copy(file, dir)
 
 def replaceDirFiles(dir, files):
 	deleteDirectoryFiles(dir)
 	copyFilesToDir(files, dir)
 
-def getFileName(path, removeExtension):
+def getFileName(path, _removeExtension):
 	name = os.path.basename(path)
-	if (removeExtension):
-		name = removeFileNameExtension(name)
+	if (_removeExtension):
+		name = removeExtension(name)
 
 	return name
 
 def getDirName(path):
 	name = os.path.basename(path)
 	return name
+
+def getParentDir(path):
+	path = os.path.dirname(path) #remove file name
+	parentDir = os.path.split(path)[0] #remove last dir
+	return parentDir
+
+def getDirectory(path):
+	path = os.path.dirname(path)
+	return dir
 
 def getLinesContainingString(filePath, string):
 	matches = []
@@ -216,3 +241,10 @@ def printList(list):
 
 def makeUuidV4():
 	return uuid.uuid4()
+
+def getMatchingJsonObject(jsonObjects, key, value):
+	for object in jsonObjects:
+		if (object[key] == value):
+			return object
+
+	return None

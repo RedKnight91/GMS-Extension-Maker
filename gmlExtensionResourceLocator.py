@@ -1,4 +1,5 @@
 import utilities as utils
+import gmsUtilities as gms
 import os
 
 
@@ -27,40 +28,6 @@ def locateResourceType(workPaths, filterType, resourceType):
 				resources.append(uuid)
 
 		return {'views' : views, 'resources' : resources}
-
-	def makeChildrenPathList(dir, view, appendExt):
-		uuids = view['children']
-		paths = makePathList(dir, uuids, appendExt)
-		return paths
-
-	def makePathList(dir, names, appendedExt):
-		paths = []
-
-		for name in names:
-			path = os.path.join(dir, name) + '.' + appendedExt
-			paths.append(path)
-
-		return paths
-
-	def filterViewsByType(viewPaths, filterType):
-		for view in viewPaths:
-			viewJson = utils.readFileJson(view)
-			filter = viewJson['filterType']
-
-			if (filter != filterType):
-				viewPaths.remove(view)
-
-		return viewPaths
-
-	def locateRootResourceView(viewPaths, resourceType):
-		for view in viewPaths:
-			viewJson = utils.readFileJson(view)
-			internalName = viewJson['localisedFolderName']
-
-			if (internalName == resourceType):
-				return viewJson
-		
-		return {}
 
 	def locateResourceExtensionView(resourceViews, name):
 		for view in resourceViews:
@@ -106,7 +73,7 @@ def locateResourceType(workPaths, filterType, resourceType):
 		resources.extend(childResources)
 
 		childViews = children['views']
-		childViewPaths = makePathList(sourceViewsDir, childViews, 'yy')
+		childViewPaths = utils.makeFilePathList(sourceViewsDir, childViews, 'yy')
 
 		for view in childViewPaths:
 			childViewJson = utils.readFileJson(view)
@@ -117,6 +84,7 @@ def locateResourceType(workPaths, filterType, resourceType):
 
 	def getScopedResources(extChildrenPaths, scopedViewName, viewUuids):
 		resourcePaths = []
+		resourceUuids = []
 
 		sourceProjectJson = utils.readFileJson(workPaths.sourceProject.file)
 		scopedViewJson = extractViewByName(extChildrenPaths, scopedViewName)
@@ -133,17 +101,18 @@ def locateResourceType(workPaths, filterType, resourceType):
 	print('\nLOCATING RESOURCES\n')
 
 	viewFiles = utils.getDirectoryExtensionFiles(sourceViewsDir, '.yy')
-	viewFiles = filterViewsByType(viewFiles, filterType)
+	viewFiles = gms.filterViewsByType(viewFiles, filterType)
 	viewUuids = utils.extractFileNames(viewFiles, True)
 
-	rootViewJson = locateRootResourceView(viewFiles, resourceType)
-	resourceViewFiles = makeChildrenPathList(sourceViewsDir, rootViewJson, 'yy')
+	rootView = gms.locateRootResourceView(viewFiles, resourceType)
+	rootViewJson = utils.readFileJson(rootView)
+	resourceViewFiles = utils.makeFilePathList(sourceViewsDir, rootViewJson['children'], 'yy')
 	resourceExtensionViewJson = locateResourceExtensionView(resourceViewFiles, extensionName)
 	#E.g. scripts/GMS_ext_name, objects/GMS_ext_name
 
 	assert 'children' in resourceExtensionViewJson, 'Could not find {} group for {} resource type'.format(extensionName, filterType)
 
-	childResourcePaths = makeChildrenPathList(sourceViewsDir, resourceExtensionViewJson, 'yy')
+	childResourcePaths = utils.makeFilePathList(sourceViewsDir, resourceExtensionViewJson['children'], 'yy')
 	
 	externalResources = getScopedResources(childResourcePaths, workPaths.externalGroupName, viewUuids)
 	internalResources = getScopedResources(childResourcePaths, workPaths.internalGroupName, viewUuids)

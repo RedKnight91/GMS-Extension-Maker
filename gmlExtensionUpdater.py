@@ -1,8 +1,7 @@
 import os
 import utilities as utils
-
-def getUpToDateExtensionFiles(extensionDir):
-	return utils.getDirectoryFiles(extensionDir)
+import gmsUtilities as gms
+from gmsUtilities import Project
 
 def listProjectDirectories(projectsDir):
 	projectDirs = []
@@ -28,47 +27,64 @@ def listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName):
 	projectDirs = utils.getSubDirectoriesContainingFileType(projectsDir, 'yyp')
 	matchingProjects = []
 
-	for project in projectDirs:
-		isSameProject = (project == extensionProjectDir)
-		usesExtension = projectUsesExtension(project, extensionName)
+	for dir in projectDirs:
+		isSameProject = (dir == extensionProjectDir)
+		usesExtension = projectUsesExtension(dir, extensionName)
 
 		if (usesExtension and not isSameProject):
-			projectExtensionPath = project + r'\extensions\{}'.format(extensionName)
-			matchingProjects.append(projectExtensionPath)
+			yypFile = utils.getDirectoryExtensionFiles(dir, 'yyp')[0]
+			name = utils.getFileName(yypFile, True)
+
+			project = Project(name, dir)
+			matchingProjects.append(project)
 
 	return matchingProjects
 
-def promptExtensionUpdateType(extensionDirs, extensionFiles):
+def promptExtensionUpdateAll():
 	prompt = 'Update all projects at once? (Y/N)'
 	updateAll = utils.promptChoice(prompt)
+	return updateAll
 
-	for extensionDir in extensionDirs:
-		if (updateAll or confirmExtensionUpdate(extensionDir)):
-			utils.replaceDirFiles(extensionDir, extensionFiles)
+def pushExtensionResourceType(resources, destDir, project, filterType, resourceType, workPaths):
+	utils.replaceDirectoriesToDir(resources, destDir)
 
-def confirmExtensionUpdate(dir):
-	prompt = 'Update this extension? (Y/N) {}'.format(dir)
+	newScriptUuids = gms.includeResourcesToProject(resources, project.file, filterType)
+	gms.addResourcesToRootView(newScriptUuids, filterType, resourceType, workPaths)
+
+
+def confirmProjectUpdate(dir):
+	prompt = 'Update this project? (Y/N) {}'.format(dir)
 	return utils.promptChoice(prompt)
 
 #Pushes an updated extension to all the projects which use it
 def pushExtension(workPaths):
 	print('\nPUSHING EXTENSION\n')
 
-	projectsDir = workPaths['projectsDir']
-	extensionProjectDir = workPaths['extensionProjectDir']
-	extensionName = workPaths['extensionName']
-	extensionDir = workPaths['extensionDir']
+	projectsDir = workPaths.projectsDir
+	extensionProjectDir = workPaths.extensionProject.dir
+	extensionName = workPaths.extension.name
+	extensionProject = workPaths.extensionProject
 
-	print('[1/3] Finding extension files\n')
-	extensionFiles = getUpToDateExtensionFiles(extensionDir)
+	print('[1/3] Retrieving extension files\n')
+	scriptFiles = utils.getSubDirectories(extensionProject.scriptsDir)
+	objectFiles = utils.getSubDirectories(extensionProject.objectsDir)
+	extensionFiles = utils.getSubDirectories(extensionProject.extensionsDir)
 
 	print('[2/3] Looking for projects using {} extension'.format(extensionName))
-	matchingExtensionDirs = listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName)
+	projectsUsingExt = listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName)
 
-	if (len(matchingExtensionDirs) == 0):
+	if (len(projectsUsingExt) == 0):
 		print('\n[3/3] No projects found')
 	else:
 		print('\n[3/3] Pushing extension to projects')
-		promptExtensionUpdateType(matchingExtensionDirs, extensionFiles)
+		updateAll = promptExtensionUpdateAll()
+
+		for project in projectsUsingExt:
+			if (updateAll or confirmProjectUpdate(project)):
+				pushExtensionResourceType(scriptFiles,		project.scriptsDir,		project, 'GMScript',	'ResourceTree_Scripts',		workPaths)
+				pushExtensionResourceType(objectFiles,		project.objectsDir,		project, 'GMObject',	'ResourceTree_Objects',		workPaths)
+				pushExtensionResourceType(extensionFiles,	project.extensionsDir,	project, 'GMExtension',	'ResourceTree_Extensions',	workPaths)
+
+		
 
 	print('\nUPDATE COMPLETED\n')

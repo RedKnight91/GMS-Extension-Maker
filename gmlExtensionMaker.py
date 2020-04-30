@@ -1,7 +1,7 @@
 from gmlExtensionPathInitializer import initExtensionPaths
 from gmlExtensionResourceLocator import locateScripts, locateObjects
 from gmlExtensionScriptCombiner import combineScripts
-from gmlExtensionFileCopier import copyFunctionsFileToExtensionDir, copyExternalResourcesToExtensionDir
+from gmlExtensionFileCopier import copyFunctionsFileToExtensionDir, copyExternalScriptsToExtensionDir, copyExternalObjectsToExtensionDir
 from gmlExtensionFunctionIncluder import includeFunctionFilesToExtension
 from gmlExtensionFunctionJsonMaker import includeFunctionsToExtension
 from gmlExtensionJsdocInjector import includeFunctionJsdocsToExtension
@@ -19,24 +19,23 @@ def makeExtension(paths):
 	workPaths = initExtensionPaths(paths)
 
 	printHeader(workPaths)
-
-	scripts = locateScripts(workPaths)
-	# objects = locateObject(workPaths)
 	
-	internalScripts = scripts['internal']
-	combineScripts(workPaths, internalScripts)
+	scriptDirs = locateScripts(workPaths)
+	objectDirs = locateObjects(workPaths)
+	
+	internalScriptDirs = scriptDirs['internal']
+	combineScripts(workPaths, internalScriptDirs)
 	copyFunctionsFileToExtensionDir(workPaths)
 
-	# externalScripts = scripts['external']
-	# copyExternalResourcesToExtensionDir(workPaths['extensionScriptsDir'], externalScripts)
-	# TODO: When copying the external resources you also need to recreate the scripts/ProjectName view and include the scripts in the .yyp... tough!
+	externalScriptDirs = scriptDirs['external']
+	copyExternalScriptsToExtensionDir(workPaths, externalScriptDirs)
 
-	# externalObjects = objects['external']
-	# copyExternalResourcesToExtensionDir(workPaths['extensionObjectsDir'], externalObjects)
+	externalObjectDirs = objectDirs['external']
+	copyExternalObjectsToExtensionDir(workPaths, externalObjectDirs)
 
 	#Editing extension's .yy file
 	includeFunctionFilesToExtension(workPaths)
 	includeFunctionsToExtension(workPaths)
 	includeFunctionJsdocsToExtension(workPaths)
-
-	# pushExtension(workPaths)
+	
+	pushExtension(workPaths)
