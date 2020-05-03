@@ -95,16 +95,16 @@ def includeResourcesToProject(resources, projectFile, filterType):
 	return newResourceUuids
 
 
-def getRootResourceView(filterType, resourceType, workPaths):
-	sourceViewsDir = workPaths.extensionProject.viewsDir
+def getRootResourceView(project, filterType, resourceType):
+	sourceViewsDir = project.viewsDir
 	viewFiles = utils.getDirectoryExtensionFiles(sourceViewsDir, '.yy')
 	viewFiles = filterViewsByType(viewFiles, filterType)
 	rootResourceView = locateRootResourceView(viewFiles, resourceType)
 
 	return rootResourceView
 
-def addResourcesToRootView(resourceUuids, filterType, resourceType, workPaths):
-	rootResourceView = getRootResourceView(filterType, resourceType, workPaths)
+def addResourcesToRootView(resourceUuids, project, filterType, resourceType):
+	rootResourceView = getRootResourceView(project, filterType, resourceType)
 	rootResourceViewJson = utils.readFileJson(rootResourceView)
 
 	for uuid in resourceUuids:

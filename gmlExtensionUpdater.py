@@ -2,6 +2,8 @@ import os
 import utilities as utils
 import gmsUtilities as gms
 from gmsUtilities import Project
+import gmlExtensionFileCopier as copier
+import gmlExtensionResourceIncluder as resourceIncluder
 
 def listProjectDirectories(projectsDir):
 	projectDirs = []
@@ -45,13 +47,6 @@ def promptExtensionUpdateAll():
 	updateAll = utils.promptChoice(prompt)
 	return updateAll
 
-def pushExtensionResourceType(resources, destDir, project, filterType, resourceType, workPaths):
-	utils.replaceDirectoriesToDir(resources, destDir)
-
-	newScriptUuids = gms.includeResourcesToProject(resources, project.file, filterType)
-	gms.addResourcesToRootView(newScriptUuids, filterType, resourceType, workPaths)
-
-
 def confirmProjectUpdate(dir):
 	prompt = 'Update this project? (Y/N) {}'.format(dir)
 	return utils.promptChoice(prompt)
@@ -66,9 +61,9 @@ def pushExtension(workPaths):
 	extensionProject = workPaths.extensionProject
 
 	print('[1/3] Retrieving extension files\n')
-	scriptFiles = utils.getSubDirectories(extensionProject.scriptsDir)
-	objectFiles = utils.getSubDirectories(extensionProject.objectsDir)
-	extensionFiles = utils.getSubDirectories(extensionProject.extensionsDir)
+	scriptDirs = utils.getSubDirectories(extensionProject.scriptsDir)
+	objectDirs = utils.getSubDirectories(extensionProject.objectsDir)
+	extensionDirs = utils.getSubDirectories(extensionProject.extensionsDir)
 
 	print('[2/3] Looking for projects using {} extension'.format(extensionName))
 	projectsUsingExt = listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName)
@@ -81,10 +76,13 @@ def pushExtension(workPaths):
 
 		for project in projectsUsingExt:
 			if (updateAll or confirmProjectUpdate(project)):
-				pushExtensionResourceType(scriptFiles,		project.scriptsDir,		project, 'GMScript',	'ResourceTree_Scripts',		workPaths)
-				pushExtensionResourceType(objectFiles,		project.objectsDir,		project, 'GMObject',	'ResourceTree_Objects',		workPaths)
-				pushExtensionResourceType(extensionFiles,	project.extensionsDir,	project, 'GMExtension',	'ResourceTree_Extensions',	workPaths)
+				copier.copyScriptsToProject(workPaths, project, scriptDirs)
+				copier.copyObjectsToProject(workPaths, project, objectDirs)
+				copier.copyExtensionsToProject(workPaths, project, extensionDirs)
 
-		
+				#TODO is this already done in copyXtoProject?
+				# resourceIncluder.includeScriptsToProject(workPaths, project)
+				# resourceIncluder.includeObjectsToProject(workPaths, project)
+				# resourceIncluder.includeExtensionsToProject(workPaths, project)
 
 	print('\nUPDATE COMPLETED\n')
