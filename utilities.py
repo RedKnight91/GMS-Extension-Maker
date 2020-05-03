@@ -248,3 +248,46 @@ def getMatchingJsonObject(jsonObjects, key, value):
 			return object
 
 	return None
+
+def splitPathDirs(path):
+    path = os.path.normpath(path)
+    dirs = []
+    
+    while True:
+        head, tail = os.path.split(path)
+        ext = os.path.splitext(tail)[1]
+
+		#Exclude file tail
+        if (ext != ''):
+          path = head
+          continue
+
+        if head == path:  # sentinel for absolute paths
+            dirs.insert(0, head)
+            break
+        elif tail == path: # sentinel for relative paths, end of split
+            dirs.insert(0, tail)
+            break
+        else:
+            path = head
+            dirs.insert(0, tail)
+
+    return dirs
+
+def splitPath(path):
+    path = os.path.normpath(path)
+    parts = []
+
+    while True:
+        head, tail = os.path.split(path)
+        if head == path:  # sentinel for absolute paths
+            parts.insert(0, head)
+            break
+        elif tail == path: # sentinel for relative paths
+            parts.insert(0, tail)
+            break
+        else:
+            path = head
+            parts.insert(0, tail)
+
+    return parts

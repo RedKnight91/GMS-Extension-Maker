@@ -1,4 +1,41 @@
 import utilities as utils
+import os
+
+def getFunctionNames(functionsFile):
+	functionNames = []
+
+	defineLines = utils.getLinesContainingString(functionsFile, '#define')
+	for line in defineLines:
+		name = line.split()[1]
+		functionNames.append(name)
+
+	return functionNames
+
+def createFunctionJson(functionName):
+	json = {
+		'id'			: str(utils.makeUuidV4()),
+		'modelName'		: 'GMExtensionFunction',
+		'mvc'			: '1.0',
+		'argCount'		: -1,
+		'args'			: [],
+		'externalName'	: functionName,
+		'help'			: '',
+		'hidden'		: 'false',
+		'kind'			: 2,
+		'name'			: functionName,
+		'returnType'	: 1
+	}
+
+	return json
+
+def createFunctionsJson(extensionDir, fileJson):
+	fileName = fileJson['filename']
+	functionsFile = os.path.join(extensionDir, fileName)
+	functionNames = getFunctionNames(functionsFile)
+	functionsJson = [createFunctionJson(functionName) for functionName in functionNames]
+
+	fileJson['functions']	= functionsJson
+	fileJson['order']		= [function['id'] for function in functionsJson]
 
 def createFunctionFileJson(file):
 	json = {
@@ -44,6 +81,14 @@ def includeFunctionFilesToExtension(workPaths):
 	extensionJson = utils.readFileJson(extensionFile)
 	extensionJson['files'] = filesJson
 	
-	utils.writeFileJson(extensionFile, extensionJson)
-
 	print('\nFUNCTION FILES INCLUDED \n')
+	print('\nPOPULATING EXTENSION WITH FUNCTION JSON\n')
+
+	print('[1/2] Making functions JSON')
+	for functionFile in filesJson:
+		createFunctionsJson(extensionDir, functionFile)
+		
+	print('[2/2] Writing JSON to extension')
+	utils.writeFileJson(extensionFile, extensionJson)
+	
+	print('\nEXTENSION FILE POPULATED\n')

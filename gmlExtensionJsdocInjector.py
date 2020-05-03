@@ -35,9 +35,11 @@ def includeFunctionJsdocsToExtension(workPaths):
 		jsdoc = jsdocsJson[name]
 		args = formatArgsBlock(jsdoc['arguments'])
 
-		function['help'] = jsdoc['helpLine']
-		function['args'] = args
-		function['argCount'] = countArgs(args, True)
+		function.update({
+			'help'		: jsdoc['helpLine'],
+			'args'		: args,
+			'argCount'	: countArgs(args, True)
+		})
 
 		return function
 

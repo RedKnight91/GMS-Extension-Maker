@@ -3,44 +3,50 @@ import gmsUtilities as gms
 import os
 
 
-def locateScripts(workPaths):
-	scripts = locateResourceType(workPaths, 'GMScript', 'ResourceTree_Scripts')
+def locateInternalScripts(workPaths):
+	viewPath = os.path.join('scripts', workPaths.internalGroupName)
+	scripts = locateScripts(workPaths, viewPath)
+	return scripts
+
+def locateExternalScripts(workPaths):
+	viewPath = os.path.join('scripts', workPaths.externalGroupName)
+	scripts = locateScripts(workPaths, viewPath)
+	return scripts
+
+def locateScripts(workPaths, viewPath):
+	scripts = locateResourceType(workPaths, 'GMScript', 'ResourceTree_Scripts', viewPath)
 	return scripts
 
 def locateObjects(workPaths):
-	objects = locateResourceType(workPaths, 'GMObject', 'ResourceTree_Objects')
+	objects = locateResourceType(workPaths, 'GMObject', 'ResourceTree_Objects', 'objects')
 	return objects
 
+def locateExtensions(workPaths):
+	extensions = locateResourceType(workPaths, 'GMExtension', 'ResourceTree_Extensions', 'extensions')
+	return extensions
 
-def locateResourceType(workPaths, filterType, resourceType):
+
+def locateResourceType(workPaths, filterType, resourceType, viewPath):
 
 	extensionName = workPaths.extension.name
 	sourceViewsDir = workPaths.sourceProject.viewsDir
 
-	def separateChildrenViewsAndResources(filteredViewUuids, viewJson):
+	def separateChildrenViewsAndResources(viewJson):
 		views = []
 		resources = []
 
 		for uuid in viewJson['children']:
-			if (uuid in filteredViewUuids):
+			viewPath = utils.makeFilePath(sourceViewsDir, uuid, 'yy')
+
+			if (os.path.exists(viewPath)):
 				views.append(uuid)
 			else:
 				resources.append(uuid)
 
 		return {'views' : views, 'resources' : resources}
 
-	def locateResourceExtensionView(resourceViews, name):
+	def filterViewByName(resourceViews, name):
 		for view in resourceViews:
-			viewJson = utils.readFileJson(view)
-			visibleName = viewJson['folderName']
-
-			if (visibleName == name):
-				return viewJson
-
-		return {}
-
-	def extractViewByName(views, name):
-		for view in views:
 			viewJson = utils.readFileJson(view)
 			visibleName = viewJson['folderName']
 
@@ -64,10 +70,15 @@ def locateResourceType(workPaths, filterType, resourceType):
 
 		return resourcePaths
 
-	def getChildResourcesRecursively(viewUuids, viewJson):
+	def makeViewPathsFromUuids(viewsDir, uuids):
+		viewPaths = [os.path.join(viewsDir, uuid) + '.yy' for uuid in uuids ]
+		viewPaths = [path for path in viewPaths if os.path.exists(path)]
+		return viewPaths
+
+	def getViewResourcesRecursive(viewJson):
 		resources = []
 
-		children = separateChildrenViewsAndResources(viewUuids, viewJson)
+		children = separateChildrenViewsAndResources(viewJson)
 
 		childResources = children['resources']
 		resources.extend(childResources)
@@ -77,47 +88,54 @@ def locateResourceType(workPaths, filterType, resourceType):
 
 		for view in childViewPaths:
 			childViewJson = utils.readFileJson(view)
-			childViewResources = getChildResourcesRecursively(viewUuids, childViewJson)
+			childViewResources = getViewResourcesRecursive(childViewJson)
 			resources.extend(childViewResources)
 
 		return resources
 
-	def getScopedResources(extChildrenPaths, scopedViewName, viewUuids):
+	def getViewResources(viewPath):
+	# def getScopedResources(extChildrenPaths, scopedViewName, viewUuids):
 		resourcePaths = []
 		resourceUuids = []
 
 		sourceProjectJson = utils.readFileJson(workPaths.sourceProject.file)
-		scopedViewJson = extractViewByName(extChildrenPaths, scopedViewName)
+		# scopedViewJson = extractViewByName(extChildrenPaths, scopedViewName)
+		viewJson = utils.readFileJson(viewPath)
 
-		if ('children' in scopedViewJson):
-			resourceUuids = getChildResourcesRecursively(viewUuids, scopedViewJson)
+		if ('children' in viewJson):
+			resourceUuids = getViewResourcesRecursive(viewJson)
 		
 		resourcePaths = makeResourcePathsFromUuids(workPaths.sourceProject.dir, sourceProjectJson, resourceUuids)
 		return resourcePaths
-
-
 
 
 	print('\nLOCATING RESOURCES\n')
 
 	viewFiles = utils.getDirectoryExtensionFiles(sourceViewsDir, '.yy')
 	viewFiles = gms.filterViewsByType(viewFiles, filterType)
-	viewUuids = utils.extractFileNames(viewFiles, True)
 
 	rootView = gms.locateRootResourceView(viewFiles, resourceType)
 	rootViewJson = utils.readFileJson(rootView)
-	resourceViewFiles = utils.makeFilePathList(sourceViewsDir, rootViewJson['children'], 'yy')
-	resourceExtensionViewJson = locateResourceExtensionView(resourceViewFiles, extensionName)
-	#E.g. scripts/GMS_ext_name, objects/GMS_ext_name
 
-	assert 'children' in resourceExtensionViewJson, 'Could not find {} group for {} resource type'.format(extensionName, filterType)
+	viewPath = utils.splitPath(viewPath)
+	currentViewPath = [rootViewJson['folderName']]
+	currentViewJson = rootViewJson
 
-	childResourcePaths = utils.makeFilePathList(sourceViewsDir, resourceExtensionViewJson['children'], 'yy')
-	
-	externalResources = getScopedResources(childResourcePaths, workPaths.externalGroupName, viewUuids)
-	internalResources = getScopedResources(childResourcePaths, workPaths.internalGroupName, viewUuids)
+	while (currentViewPath != viewPath):
+		viewChildren = currentViewJson['children']
+		viewChildren = makeViewPathsFromUuids(workPaths.sourceProject.viewsDir, viewChildren)
+		nextViewPath = viewPath[len(currentViewPath)]
+		currentViewJson = filterViewByName(viewChildren, nextViewPath)
+
+		assert 'children' in currentViewJson, 'Could not find {} group for {} resource type'.format(extensionName, filterType)
+		
+		currentViewPath.append(currentViewJson['folderName'])
+
+	viewUuid = currentViewJson['id']
+	viewPath = utils.makeFilePath(sourceViewsDir, viewUuid, 'yy')
+	resources = getViewResources(viewPath)
+	# resources = getViewResources(childResourcePaths, viewPath, viewUuids)
 
 	print('\nRESOURCES LOCATED\n')
 
-	resources = {'external' : externalResources, 'internal' : internalResources}
 	return resources

@@ -18,14 +18,17 @@ def copyFunctionsFileToExtensionDir(workPaths):
 
 
 
-def copyExternalScriptsToExtensionDir(workPaths, externalScriptDirs):
-	copyExternalResourcesToExtensionDir(workPaths, 'GMScript', 'ResourceTree_Scripts', workPaths.extensionProject.scriptsDir, externalScriptDirs)
+def copyScriptsToExtensionDir(workPaths, scriptDirs):
+	copyResourcesToExtensionDir(workPaths, 'GMScript', 'ResourceTree_Scripts', workPaths.extensionProject.scriptsDir, scriptDirs)
 
-def copyExternalObjectsToExtensionDir(workPaths, externalObjectDirs):
-	copyExternalResourcesToExtensionDir(workPaths, 'GMObject', 'ResourceTree_Objects', workPaths.extensionProject.objectsDir, externalObjectDirs)
+def copyObjectsToExtensionDir(workPaths, objectDirs):
+	copyResourcesToExtensionDir(workPaths, 'GMObject', 'ResourceTree_Objects', workPaths.extensionProject.objectsDir, objectDirs)
+
+def copyExtensionsToExtensionDir(workPaths, extensionDirs):
+	copyResourcesToExtensionDir(workPaths, 'GMExtension', 'ResourceTree_Extensions', workPaths.extensionProject.extensionsDir, extensionDirs)
 
 
-def copyExternalResourcesToExtensionDir(workPaths, filterType, resourceType, resourceDir, externalResources):
+def copyResourcesToExtensionDir(workPaths, filterType, resourceType, resourceDir, externalResources):
 	print('\nCOPYING EXTERNAL RESOURCES\n')
 
 	prompt = 'Copy external resources to this folder? (Y/N)\n{}'.format(resourceDir)

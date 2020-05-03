@@ -1,10 +1,10 @@
 from gmlExtensionPathInitializer import initExtensionPaths
-from gmlExtensionResourceLocator import locateScripts, locateObjects
+import gmlExtensionResourceLocator as locator
 from gmlExtensionScriptCombiner import combineScripts
-from gmlExtensionFileCopier import copyFunctionsFileToExtensionDir, copyExternalScriptsToExtensionDir, copyExternalObjectsToExtensionDir
+import gmlExtensionFileCopier as copier
 from gmlExtensionFunctionIncluder import includeFunctionFilesToExtension
-from gmlExtensionFunctionJsonMaker import includeFunctionsToExtension
 from gmlExtensionJsdocInjector import includeFunctionJsdocsToExtension
+import gmlExtensionResourceIncluder as resourceIncluder
 from gmlExtensionUpdater import pushExtension
 import utilities as utils
 
@@ -17,25 +17,30 @@ def printHeader(workPaths):
 
 def makeExtension(paths):
 	workPaths = initExtensionPaths(paths)
-
 	printHeader(workPaths)
 	
-	scriptDirs = locateScripts(workPaths)
-	objectDirs = locateObjects(workPaths)
+	#Get resources to copy from source project
+	externalScriptDirs	= locator.locateExternalScripts(workPaths)
+	internalScriptDirs	= locator.locateInternalScripts(workPaths)
+	objectDirs			= locator.locateObjects(workPaths)
+	extensionDirs		= locator.locateExtensions(workPaths)
 	
-	internalScriptDirs = scriptDirs['internal']
 	combineScripts(workPaths, internalScriptDirs)
-	copyFunctionsFileToExtensionDir(workPaths)
-
-	externalScriptDirs = scriptDirs['external']
-	copyExternalScriptsToExtensionDir(workPaths, externalScriptDirs)
-
-	externalObjectDirs = objectDirs['external']
-	copyExternalObjectsToExtensionDir(workPaths, externalObjectDirs)
-
-	#Editing extension's .yy file
-	includeFunctionFilesToExtension(workPaths)
-	includeFunctionsToExtension(workPaths)
-	includeFunctionJsdocsToExtension(workPaths)
 	
+	#Copy resources to extension project
+	copier.copyFunctionsFileToExtensionDir(workPaths)
+	copier.copyScriptsToExtensionDir(workPaths, externalScriptDirs)
+	copier.copyObjectsToExtensionDir(workPaths, objectDirs)
+	copier.copyExtensionsToExtensionDir(workPaths, extensionDirs)
+
+	#Include files and functions to extension (.yy)
+	includeFunctionFilesToExtension(workPaths)
+	includeFunctionJsdocsToExtension(workPaths)
+
+	#Include resources to extension project (.yyp)
+	resourceIncluder.includeScriptsToProject(workPaths, workPaths.extensionProject)
+	resourceIncluder.includeObjectsToProject(workPaths, workPaths.extensionProject)
+	resourceIncluder.includeExtensionsToProject(workPaths, workPaths.extensionProject)
+	#TODO Can reutilize these in pushExtension!
+
 	pushExtension(workPaths)
