@@ -4,13 +4,13 @@ import shutil
 import json
 import uuid
 
-def makeFilePath(dir, name, extension):
+def makePath(dir, name, extension):
 	path = os.path.join(dir, name) + '.' + extension
 	return path
 
 
-def makeFilePathList(dir, names, extension):
-	paths = [makeFilePath(dir, name, extension) for name in names]
+def makePathList(dir, names, extension):
+	paths = [makePath(dir, name, extension) for name in names]
 	return paths
 
 def extractFileNames(paths, excludeExtension):
@@ -181,6 +181,10 @@ def getFileName(path, _removeExtension):
 
 	return name
 
+def getDir(path):
+	dir = os.path.dirname(path)
+	return dir
+
 def getDirName(path):
 	name = os.path.basename(path)
 	return name
@@ -208,13 +212,13 @@ def writeFile(filePath, content):
 	with open(filePath, 'w') as file:
 		file.write(content)
 
-def readFileJson(filePath):
+def readJson(filePath):
 	with open(filePath, 'r') as file:
 		content = json.load(file)
 
 	return content
 
-def writeFileJson(filePath, content):
+def writeJson(filePath, content):
 	with open(filePath, 'w') as file:
 		json.dump(content, file, indent = 4)
 
@@ -291,3 +295,40 @@ def splitPath(path):
             parts.insert(0, tail)
 
     return parts
+
+
+def valueInDicts(dictList, value):
+	#Returns True if any key's value in any dict matches searchedValue
+	isMatch = any((_dict[key] == value for key in _dict) for _dict in dictList)
+	return isMatch
+
+def valueInDictsKey(dictList, key, value):
+	#Returns True if a specific key's value in any dict matches searchedValue
+	isMatch = any(_dict[key] == value for _dict in dictList)
+	return isMatch
+
+def dictInDicts(dictList, searchDict):
+	#Returns True if all keys in any dict match all keys in searchedDict
+	isMatch = any(all(_dict[key] == searchDict[key] for key in searchDict) for _dict in dictList)
+	return isMatch
+
+
+def findDictsMatchingValue(dictList, value):
+	#Returns dicts with ANY key's value matching searchedValue
+	matchingDicts = [_dict for _dict in dictList if any(_dict[key] == value for key in _dict)]
+	return matchingDicts
+
+def findDictsMatchingKeyValue(dictList, key, value):
+	#Returns dicts with A key's value matching searchedValue
+	matchingDicts = [_dict for _dict in dictList if _dict[key] == value]
+	return matchingDicts
+
+def findDictsWithKeyValueInList(dictList, key, list):
+	#Returns dicts with A key's value matching searchedValue
+	matchingDicts = [_dict for _dict in dictList if _dict[key] in list]
+	return matchingDicts
+
+def findDictsMatchingDict(dictList, searchDict):
+	#Returns dicts with all keys matching searchedDict keys
+	matchingDicts = [_dict for _dict in dictList if all(_dict[key] == searchDict[key] for key in searchDict)]
+	return matchingDicts

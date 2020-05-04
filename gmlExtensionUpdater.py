@@ -3,7 +3,6 @@ import utilities as utils
 import gmsUtilities as gms
 from gmsUtilities import Project
 import gmlExtensionFileCopier as copier
-import gmlExtensionResourceIncluder as resourceIncluder
 
 def listProjectDirectories(projectsDir):
 	projectDirs = []
@@ -51,8 +50,7 @@ def confirmProjectUpdate(dir):
 	prompt = 'Update this project? (Y/N) {}'.format(dir)
 	return utils.promptChoice(prompt)
 
-#Pushes an updated extension to all the projects which use it
-def pushExtension(workPaths):
+def updateExtensionInProjects(workPaths):
 	print('\nPUSHING EXTENSION\n')
 
 	projectsDir = workPaths.projectsDir
@@ -79,10 +77,5 @@ def pushExtension(workPaths):
 				copier.copyScriptsToProject(workPaths, project, scriptDirs)
 				copier.copyObjectsToProject(workPaths, project, objectDirs)
 				copier.copyExtensionsToProject(workPaths, project, extensionDirs)
-
-				#TODO is this already done in copyXtoProject?
-				# resourceIncluder.includeScriptsToProject(workPaths, project)
-				# resourceIncluder.includeObjectsToProject(workPaths, project)
-				# resourceIncluder.includeExtensionsToProject(workPaths, project)
 
 	print('\nUPDATE COMPLETED\n')

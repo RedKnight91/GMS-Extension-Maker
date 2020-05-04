@@ -4,7 +4,7 @@ from gmlExtensionScriptCombiner import combineScripts
 import gmlExtensionFileCopier as copier
 from gmlExtensionFunctionIncluder import includeFunctionFilesToExtension
 from gmlExtensionJsdocInjector import includeFunctionJsdocsToExtension
-from gmlExtensionUpdater import pushExtension
+from gmlExtensionUpdater import updateExtensionInProjects
 import utilities as utils
 
 def printHeader(workPaths):
@@ -37,4 +37,4 @@ def makeExtension(paths):
 	includeFunctionFilesToExtension(workPaths)
 	includeFunctionJsdocsToExtension(workPaths)
 
-	pushExtension(workPaths)
+	updateExtensionInProjects(workPaths)

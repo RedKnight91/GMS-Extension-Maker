@@ -26,9 +26,9 @@ def includeFunctionJsdocsToExtension(workPaths):
 	print('\nINJECT JSDOCS\n')
 
 	extensionFile = workPaths.extension.file
-	extensionJson = utils.readFileJson(extensionFile)
+	extensionJson = utils.readJson(extensionFile)
 	jsdocsFile = workPaths.combinedJsdocs.file
-	jsdocsJson = utils.readFileJson(jsdocsFile)
+	jsdocsJson = utils.readJson(jsdocsFile)
 
 	def injectFunctionJsdoc(function):		
 		name = function['externalName']
@@ -52,6 +52,6 @@ def includeFunctionJsdocsToExtension(workPaths):
 	extensionJson['files'] = [injectFileJsdocs(file) for file in extensionJson['files']]
 
 	print('[2/2] Writing JSON to file')
-	utils.writeFileJson(extensionFile, extensionJson)
+	utils.writeJson(extensionFile, extensionJson)
 
 	print('\nJSDOCS INJECTED\n')

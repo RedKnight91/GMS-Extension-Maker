@@ -24,9 +24,27 @@ class Project(File):
 
 
 
+
+def getRootResourceView(project, filterType, resourceType):
+	viewsDir = project.viewsDir
+	viewFiles = utils.getDirectoryExtensionFiles(viewsDir, '.yy')
+	viewFiles = filterViewsByType(viewFiles, filterType)
+	rootResourceView = locateRootResourceView(viewFiles, resourceType)
+
+	return rootResourceView
+
+def addResourcesToRootView(resourceUuids, project, filterType, resourceType):
+	rootResourceView = getRootResourceView(project, filterType, resourceType)
+	rootResourceViewJson = utils.readJson(rootResourceView)
+
+	for uuid in resourceUuids:
+		rootResourceViewJson['children'].append(uuid)
+
+	utils.writeJson(rootResourceView, rootResourceViewJson)
+
 def locateRootResourceView(viewPaths, resourceType):
 	for view in viewPaths:
-		viewJson = utils.readFileJson(view)
+		viewJson = utils.readJson(view)
 		internalName = viewJson['localisedFolderName']
 
 		if (internalName == resourceType):
@@ -36,7 +54,7 @@ def locateRootResourceView(viewPaths, resourceType):
 
 def filterViewsByType(viewPaths, filterType):
 	for view in viewPaths:
-		viewJson = utils.readFileJson(view)
+		viewJson = utils.readJson(view)
 		filter = viewJson['filterType']
 
 		if (filter != filterType):
@@ -60,6 +78,15 @@ def createResourceJson(path, type):
 
 	return json
 
+def makeResourcePath(projectDir, partialResourcePath):
+	path = os.path.join(projectDir, partialResourcePath)
+	return path
+
+def makeResourceDirPath(projectDir, partialResourcePath):
+	fullPath = makeResourcePath(projectDir, partialResourcePath)
+	dirPath = utils.getDir(fullPath)
+	return dirPath
+
 def isResourceInProjectFile(name, resourceType, projectJson):
 	resources = projectJson['resources']
 
@@ -81,7 +108,7 @@ def includeResourceToProject(resPath, resType, projectJson):
 	return uuid
 
 def includeResourcesToProject(resources, projectFile, filterType):
-	projectJson = utils.readFileJson(projectFile)
+	projectJson = utils.readJson(projectFile)
 	newResourceUuids = []
 
 	for resource in resources:
@@ -91,23 +118,5 @@ def includeResourcesToProject(resources, projectFile, filterType):
 			resourceUuid = includeResourceToProject(resource, filterType, projectJson)
 			newResourceUuids.append(resourceUuid)
 			
-	utils.writeFileJson(projectFile, projectJson)
+	utils.writeJson(projectFile, projectJson)
 	return newResourceUuids
-
-
-def getRootResourceView(project, filterType, resourceType):
-	sourceViewsDir = project.viewsDir
-	viewFiles = utils.getDirectoryExtensionFiles(sourceViewsDir, '.yy')
-	viewFiles = filterViewsByType(viewFiles, filterType)
-	rootResourceView = locateRootResourceView(viewFiles, resourceType)
-
-	return rootResourceView
-
-def addResourcesToRootView(resourceUuids, project, filterType, resourceType):
-	rootResourceView = getRootResourceView(project, filterType, resourceType)
-	rootResourceViewJson = utils.readFileJson(rootResourceView)
-
-	for uuid in resourceUuids:
-		rootResourceViewJson['children'].append(uuid)
-
-	utils.writeFileJson(rootResourceView, rootResourceViewJson)

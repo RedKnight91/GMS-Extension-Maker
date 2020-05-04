@@ -135,7 +135,7 @@ def writeCombinedFiles(jsdocs, functions, combinedFilesDir, functionsFilePath, j
 	utils.writeFile(functionsFilePath, functions)
 
 	print('Writing {}'.format(jsdocFilePath))
-	utils.writeFileJson(jsdocFilePath, jsdocs)
+	utils.writeJson(jsdocFilePath, jsdocs)
 
 
 def combineScripts(workPaths, scriptDirs):

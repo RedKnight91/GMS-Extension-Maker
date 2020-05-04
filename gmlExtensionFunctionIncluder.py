@@ -78,7 +78,7 @@ def includeFunctionFilesToExtension(workPaths):
 	filesJson = createFunctionFilesJson(extensionDir)
 
 	print('[2/2] Writing JSON to file')
-	extensionJson = utils.readFileJson(extensionFile)
+	extensionJson = utils.readJson(extensionFile)
 	extensionJson['files'] = filesJson
 	
 	print('\nFUNCTION FILES INCLUDED \n')
@@ -89,6 +89,6 @@ def includeFunctionFilesToExtension(workPaths):
 		createFunctionsJson(extensionDir, functionFile)
 		
 	print('[2/2] Writing JSON to extension')
-	utils.writeFileJson(extensionFile, extensionJson)
+	utils.writeJson(extensionFile, extensionJson)
 	
 	print('\nEXTENSION FILE POPULATED\n')
