@@ -4,12 +4,12 @@ import os
 
 
 def locateInternalScripts(workPaths):
-	viewPath = os.path.join('scripts', workPaths.internalGroupName)
+	viewPath = os.path.join('scripts', workPaths.internalScriptsGroup)
 	scripts = locateScripts(workPaths, viewPath)
 	return scripts
 
 def locateExternalScripts(workPaths):
-	viewPath = os.path.join('scripts', workPaths.externalGroupName)
+	viewPath = os.path.join('scripts', workPaths.externalScriptsGroup)
 	scripts = locateScripts(workPaths, viewPath)
 	return scripts
 
@@ -18,11 +18,13 @@ def locateScripts(workPaths, viewPath):
 	return scripts
 
 def locateObjects(workPaths):
-	objects = locateResourceType(workPaths, 'GMObject', 'ResourceTree_Objects', 'objects')
+	viewPath = os.path.join('objects', workPaths.externalObjectsGroup)
+	objects = locateResourceType(workPaths, 'GMObject', 'ResourceTree_Objects', viewPath)
 	return objects
 
 def locateExtensions(workPaths):
-	extensions = locateResourceType(workPaths, 'GMExtension', 'ResourceTree_Extensions', 'extensions')
+	viewPath = 'extensions'
+	extensions = locateResourceType(workPaths, 'GMExtension', 'ResourceTree_Extensions', viewPath)
 	return extensions
 
 
@@ -47,8 +49,6 @@ def makeViewPaths(viewsDir, uuids):
 
 def filterViewByName(viewPaths, name):
 	view = next((view for view in viewPaths if (utils.readJson(view)['folderName'] == name)), None)
-	assert view != None, 'No matching view found'
-
 	return view
 
 #Gets a viewPath given a Group path like 'scripts/Name/things'
@@ -58,15 +58,19 @@ def getViewAtPath(rootView, viewsDir, viewPath):
 	currentViewJson = utils.readJson(currentViewPath)
 	path = [currentViewJson['folderName']]
 
-	while (path != viewPath):
+	while (path != viewPath and currentViewPath != None):
 		viewChildPaths = makeViewPaths(viewsDir, currentViewJson['children'])
 		nextView = viewPath[len(path)]
 
 		currentViewPath = filterViewByName(viewChildPaths, nextView)
+		if currentViewPath == None:
+			print('Not a valid view path: {}'.format(os.path.join(*viewPath)))
+			break
+
 		currentViewJson = utils.readJson(currentViewPath)
 
 		path.append(currentViewJson['folderName'])
-		
+	
 	return currentViewPath
 
 def getViewResourcesRecursive(viewsDir, viewJson):
@@ -84,7 +88,7 @@ def getViewResourcesRecursive(viewsDir, viewJson):
 
 def getViewResources(project, viewPath):
 	sourceProjectJson = utils.readJson(project.file)
-	viewJson = utils.readJson(viewPath)
+	viewJson = {} if (viewPath == None) else utils.readJson(viewPath)
 
 	resourceUuids = [] if ('children' not in viewJson) else getViewResourcesRecursive(project.viewsDir, viewJson)
 	resourcePaths = findResourcePaths(project.dir, sourceProjectJson, resourceUuids)
@@ -100,7 +104,7 @@ def locateResourceType(workPaths, filterType, resourceType, viewPath):
 
 	rootView = gms.getRootResourceView(project, filterType, resourceType)
 
-	viewAtPath = getViewAtPath(rootView,viewsDir, viewPath)
+	viewAtPath = getViewAtPath(rootView, viewsDir, viewPath)
 	resources = getViewResources(project, viewAtPath)
 
 	print('\nRESOURCES LOCATED\n')

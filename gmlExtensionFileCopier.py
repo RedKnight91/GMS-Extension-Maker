@@ -25,6 +25,10 @@ def copyExtensionsToProject(workPaths, project, extensionDirs):
 def copyResourcesToProject(workPaths, project, filterType, resourceType, resourceDir, resources):
 	print('\nCOPYING EXTERNAL RESOURCES\n')
 
+	if (not os.path.exists(resourceDir)):
+		print('"{}" folder not found for project {}'.format(utils.getDirName(resourceDir), project.name))
+		return
+
 	#Copy resources to Extension Project
 	utils.replaceDirectoriesToDir(resources, resourceDir)
 

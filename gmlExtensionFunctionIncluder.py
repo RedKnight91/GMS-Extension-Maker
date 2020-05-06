@@ -20,7 +20,7 @@ def createFunctionJson(functionName):
 		'args'			: [],
 		'externalName'	: functionName,
 		'help'			: '',
-		'hidden'		: 'false',
+		'hidden'		: False,
 		'kind'			: 2,
 		'name'			: functionName,
 		'returnType'	: 1
@@ -52,7 +52,7 @@ def createFunctionFileJson(file):
 		'kind'			: 2,
 		'order'			: [],
 		'origname'		: '',
-		'uncompress'	: 'false'
+		'uncompress'	: False
 	}
 
 	return json

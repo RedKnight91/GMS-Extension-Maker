@@ -1,4 +1,4 @@
-from gmlExtensionPathInitializer import initExtensionPaths
+from gmlExtensionPathInitializer import validateWorkPaths, printWorkPaths
 import gmlExtensionResourceLocator as locator
 from gmlExtensionScriptCombiner import combineScripts
 import gmlExtensionFileCopier as copier
@@ -14,9 +14,11 @@ def printHeader(workPaths):
 	print('Making extension "{}" in project {}, combining project {}'.format(extensionName, extensionProjectName, sourceProjectName))
 
 
-def makeExtension(paths):
-	workPaths = initExtensionPaths(paths)
+def makeExtension(workPaths):
 	printHeader(workPaths)
+
+	validateWorkPaths(workPaths)
+	# printWorkPaths(workPaths)
 	
 	#Get resources to copy from source project
 	externalScriptDirs	= locator.locateExternalScripts(workPaths)

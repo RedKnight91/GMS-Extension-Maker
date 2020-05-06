@@ -1,27 +1,53 @@
 import utilities as utils
-import os
+from os.path import join, basename, normpath
 
 class File:
 	def __init__(self, name, dir, extension):
 		self.name	= name
 		self.dir	= dir
-		self.file	= os.path.join(dir, name) + '.' + extension
+		self.file	= join(dir, name) + '.' + extension
 
 	def __str__(self):
 		return 'name: {},\ndir : {},\nfile: {}\n'.format(self.name, self.dir, self.file)
 
 class Project(File):
 	def __init__(self, name, dir):
+		dir = normpath(dir)
+
 		File.__init__(self, name, dir, 'yyp')
-		self.scriptsDir		= os.path.join(dir, 'scripts')
-		self.objectsDir		= os.path.join(dir, 'objects')
-		self.viewsDir		= os.path.join(dir, 'views')
-		self.extensionsDir	= os.path.join(dir, 'extensions')
+		self.scriptsDir		= join(dir, 'scripts')
+		self.objectsDir		= join(dir, 'objects')
+		self.viewsDir		= join(dir, 'views')
+		self.extensionsDir	= join(dir, 'extensions')
 
 	def __str__(self):
 		output = File.__str__(self)
 		return output + 'scriptsDir: {},\nobjectsDir: {},\nviewsDir: {},\nextensionsDir: {}'.format(self.scriptsDir, self.objectsDir, self.viewsDir, self.extensionsDir)
 
+class ProductionPaths():
+	def __init__(self, projectsDir, sourceProjectDir, extensionProjectDir, extensionName, combinedDir, externalScriptsGroup, internalScriptsGroup, externalObjectsGroup):
+		self.projectsDir		= normpath(projectsDir)
+
+		sourceProjectName		= basename(sourceProjectDir)
+		self.sourceProject		= Project(sourceProjectName, sourceProjectDir)
+
+		extensionProjectName	= basename(extensionProjectDir)
+		self.extensionProject	= Project(extensionProjectName, extensionProjectDir)
+
+		self.combinedDir		= join(normpath(combinedDir), sourceProjectName)
+		functionsName			= sourceProjectName + '_functions'
+
+		extensionDir			= join(self.extensionProject.extensionsDir, extensionName)
+		self.extension			= File(extensionName, extensionDir, 'yy')
+		self.extension.functions= File(functionsName, extensionDir, 'gml')
+
+		self.combinedFunctions	= File(functionsName, combinedDir, 'gml')
+		self.combinedJsdocs		= File('jsdocs', combinedDir, 'gml')
+
+		self.externalScriptsGroup	= externalScriptsGroup
+		self.internalScriptsGroup	= internalScriptsGroup
+
+		self.externalObjectsGroup	= externalObjectsGroup
 
 
 
@@ -63,9 +89,9 @@ def filterViewsByType(viewPaths, filterType):
 	return viewPaths
 
 def createResourceJson(path, type):
-	name = os.path.basename(path)
+	name = basename(path)
 	dir = utils.removeExtension(path)
-	yyPath = os.path.join(dir, name) + '.yy'
+	yyPath = join(dir, name) + '.yy'
 
 	json = {
 		'Key': str(utils.makeUuidV4()),
@@ -79,7 +105,7 @@ def createResourceJson(path, type):
 	return json
 
 def makeResourcePath(projectDir, partialResourcePath):
-	path = os.path.join(projectDir, partialResourcePath)
+	path = join(projectDir, partialResourcePath)
 	return path
 
 def makeResourceDirPath(projectDir, partialResourcePath):
@@ -112,7 +138,7 @@ def includeResourcesToProject(resources, projectFile, filterType):
 	newResourceUuids = []
 
 	for resource in resources:
-		name = os.path.basename(resource)
+		name = basename(resource)
 
 		if (not isResourceInProjectFile(name, filterType, projectJson)):
 			resourceUuid = includeResourceToProject(resource, filterType, projectJson)

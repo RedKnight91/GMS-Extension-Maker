@@ -84,23 +84,24 @@ def getSubDirectoriesContainingFileType(path, extension):
 	return matchingDirs
 
 def getSubDirectories(path):
-	dirList = []
+	if (not os.path.exists(path)):
+		return []
+
 	dirContent = next(os.walk(path))
 	root = dirContent[0]
 	directories = dirContent[1]
 
-	for dir in directories:
-		dirList.append(os.path.join(root, dir))
+	dirList = [os.path.join(root, dir) for dir in directories]
 
 	return dirList
 
 
 def getSubDirectoriesRecursive(path):
-	dirList = []
-
+	if (not os.path.exists(path)):
+		return []
+		
 	for root, directories, _ in os.walk(path):
-		for dir in directories:
-			dirList.append(os.path.join(root, dir))
+		dirList = [os.path.join(root, dir) for dir in directories]
 
 	return dirList
 
