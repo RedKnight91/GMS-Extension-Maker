@@ -72,15 +72,34 @@ def getDirectoryExtensionFilesRecursive(path, extension):
 
 	return fileList
 
+#Gets all child directories which contain a file with a specific extension
 def getSubDirectoriesContainingFileType(path, extension):
 	os.chdir(path)
 	fileFormat = '**/*.{}'.format(extension)
 	files = glob.glob(fileFormat, recursive = True)
 
-	matchingDirs = []
-	for file in files:
-		matchingDirs.append(os.path.dirname(os.path.abspath(file)))
+	matchingDirs = [os.path.dirname(os.path.abspath(file)) for file in files]
 	
+	return matchingDirs
+
+#Gets all child directories which contain a file with a specific extension
+#Doesn't look in a directories children if the file is found in the directory
+def getDirectoriesContainingFileType(path, extension):
+	subdirs = []
+	contents = os.listdir(path)
+
+	for item in contents:
+		item = os.path.join(path, item)
+
+		if os.path.isdir(item):
+			subdirs.append(item)
+		elif os.path.isfile(item) and item.endswith('.' + extension):
+			return [path]
+
+	matchingDirs = []
+	for dir in subdirs:
+		matchingDirs.extend(getDirectoriesContainingFileType(dir, extension))
+
 	return matchingDirs
 
 def getSubDirectories(path):

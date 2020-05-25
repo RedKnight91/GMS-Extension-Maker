@@ -25,7 +25,7 @@ def projectUsesExtension(project, extensionName):
 	return False
 
 def listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName):
-	projectDirs = utils.getSubDirectoriesContainingFileType(projectsDir, 'yyp')
+	projectDirs = utils.getDirectoriesContainingFileType(projectsDir, 'yyp')
 	matchingProjects = []
 
 	for dir in projectDirs:

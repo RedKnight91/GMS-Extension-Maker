@@ -28,7 +28,11 @@ def extractArgumentName(string, paramTag):
 		paramTagIndex = words.index(paramTag)
 	else:
 		paramTagIndex = words.index('///' + paramTag)
-		
+
+	#In case the param is missing a name
+	if (len(words) <= paramTagIndex + 1):
+		words.append(" ")
+
 	argIndex = paramTagIndex + 1
 	argName = words[argIndex]
 
