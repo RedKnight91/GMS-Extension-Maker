@@ -55,3 +55,14 @@ class Projects():
 		'Internal',
 		'External'
 	)
+
+	GMS_camera = ProductionPaths(
+		'C:/Users/mikec/Documents/GameMakerStudio2',
+		'C:/Users/mikec/Documents/GameMakerStudio2/Assets/GMS_camera/GMS_camera',
+		'C:/Users/mikec/Documents/GameMakerStudio2/Assets/GMS_camera/GMS_camera_extension',
+		'GMS_camera',
+		'C:/Users/mikec/Desktop/GMLCombinerResults',
+		'External',
+		'Internal',
+		'External'
+	)

@@ -27,7 +27,8 @@ def copyResourcesToProject(workPaths, project, filterType, resourceType, resourc
 
 	if (not os.path.exists(resourceDir)):
 		print('"{}" folder not found for project {}'.format(utils.getDirName(resourceDir), project.name))
-		return
+		print('Creating "{}" folder'.format(utils.getDirName(resourceDir)))
+		os.mkdir(resourceDir)
 
 	#Copy resources to Extension Project
 	utils.replaceDirectoriesToDir(resources, resourceDir)
