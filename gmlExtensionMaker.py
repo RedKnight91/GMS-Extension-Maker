@@ -1,11 +1,11 @@
 from gmlExtensionPathInitializer import validateWorkPaths, printWorkPaths
 import gmlExtensionResourceLocator as locator
 from gmlExtensionScriptCombiner import combineScripts
-import gmlExtensionFileCopier as copier
-from gmlExtensionFunctionIncluder import includeFunctionFilesToExtension
-from gmlExtensionJsdocInjector import includeFunctionJsdocsToExtension
-from gmlExtensionUpdater import updateExtensionInProjects
+from gmlExtensionUpdater import updateExtensionToProjects
+from gmlExtensionGenerator import generateAssetExtension
 import utilities as utils
+
+debugMode = False
 
 def printHeader(workPaths):
 	extensionName = workPaths.extension.name
@@ -18,25 +18,12 @@ def makeExtension(workPaths):
 	printHeader(workPaths)
 
 	validateWorkPaths(workPaths)
-	# printWorkPaths(workPaths)
+	if debugMode:
+		printWorkPaths(workPaths)
 	
-	#Get resources to copy from source project
-	externalScriptDirs	= locator.locateExternalScripts(workPaths)
-	internalScriptDirs	= locator.locateInternalScripts(workPaths)
-	objectDirs			= locator.locateObjects(workPaths)
-	extensionDirs		= locator.locateExtensions(workPaths)
-	
-	combineScripts(workPaths, internalScriptDirs)
-	
-	#Copy resources to extension project
-	extensionProject = workPaths.extensionProject
-	copier.copyFunctionsFileToExtension(workPaths)
-	copier.copyScriptsToProject(workPaths, extensionProject, externalScriptDirs)
-	copier.copyObjectsToProject(workPaths, extensionProject, objectDirs)
-	copier.copyExtensionsToProject(workPaths, extensionProject, extensionDirs)
+	generateAssetExtension(workPaths)
 
-	#Include files and functions to extension (.yy)
-	includeFunctionFilesToExtension(workPaths)
-	includeFunctionJsdocsToExtension(workPaths)
+	sourceScriptDirs = locator.locateScripts(workPaths)
+	combineScripts(workPaths, sourceScriptDirs)
 
-	updateExtensionInProjects(workPaths)
+	updateExtensionToProjects(workPaths)

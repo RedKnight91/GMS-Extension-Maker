@@ -7,7 +7,7 @@ def printWorkPaths(workPaths):
 	print('Extension Project:\n', workPaths.extensionProject, '\n')
 	print('Extension:\n', workPaths.extension, '\n')
 	print('Extension Functions:\n', workPaths.extension.functions, '\n')
-	print('Combined Functions:\n', workPaths.combinedFunctions, '\n')
+	print('Combined Functions:\n', workPaths.combinedScripts, '\n')
 	print('Combined Jsdocs:\n', workPaths.combinedJsdocs, '\n')
 	print('External Group:\n', workPaths.externalScriptsGroup, '\n')
 	print('Internal Group:\n', workPaths.internalScriptsGroup, '\n')

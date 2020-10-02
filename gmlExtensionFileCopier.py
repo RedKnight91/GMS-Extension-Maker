@@ -1,40 +1,39 @@
 import utilities as utils
-import gmsUtilities as gms
+from gmsUtilities import includeResourcesToProject
 import os
 
-def copyFunctionsFileToExtension(workPaths):
-	print('\nCOPYING FUNCTIONS FILE\n')
+def copyScriptFileToExtension(workPaths, scriptDirs):
+	print('\nCOPYING SCRIPT FILES TO EXTENSION\n')
 
 	extensionDir = workPaths.extension.dir
 
-	functions = [workPaths.combinedFunctions.file]
-	utils.replaceFilesToDir(functions, extensionDir)
+	for dir in scriptDirs:
+		script = utils.getDirectoryExtensionFiles(dir, 'gml')
+		utils.replaceFilesToDir(script, extensionDir)
 
 	print('\nFUNCTIONS FILE COPIED\n')
 
 
-def copyScriptsToProject(workPaths, project, scriptDirs):
-	copyResourcesToProject(workPaths, project, 'GMScript', 'ResourceTree_Scripts', project.scriptsDir, scriptDirs)
-
-def copyObjectsToProject(workPaths, project, objectDirs):
-	copyResourcesToProject(workPaths, project, 'GMObject', 'ResourceTree_Objects', project.objectsDir, objectDirs)
-
-def copyExtensionsToProject(workPaths, project, extensionDirs):
-	copyResourcesToProject(workPaths, project, 'GMExtension', 'ResourceTree_Extensions', project.extensionsDir, extensionDirs)
-
-def copyResourcesToProject(workPaths, project, filterType, resourceType, resourceDir, resources):
-	print('\nCOPYING EXTERNAL RESOURCES\n')
-
+def ensureResourceDirExists(project, resourceDir):
 	if (not os.path.exists(resourceDir)):
 		print('"{}" folder not found for project {}'.format(utils.getDirName(resourceDir), project.name))
 		print('Creating "{}" folder'.format(utils.getDirName(resourceDir)))
 		os.mkdir(resourceDir)
 
-	#Copy resources to Extension Project
+def copyScriptsToProject(workPaths, project, scriptDirs):
+	copyResourcesToProject(workPaths, project, project.scriptsDir, scriptDirs)
+
+def copyObjectsToProject(workPaths, project, objectDirs):
+	copyResourcesToProject(workPaths, project, project.objectsDir, objectDirs)
+
+def copyExtensionsToProject(workPaths, project, extensionDirs):
+	copyResourcesToProject(workPaths, project, project.extensionsDir, extensionDirs)
+
+def copyResourcesToProject(workPaths, project, resourceDir, resources):
+	print('\nCOPYING EXTERNAL RESOURCES\n')
+
+	ensureResourceDirExists(project, resourceDir)
 	utils.replaceDirectoriesToDir(resources, resourceDir)
-
-	#Include resources to project
-	newResourceUuids = gms.includeResourcesToProject(resources, project.file, filterType)
-	gms.addResourcesToRootView(newResourceUuids, project, filterType, resourceType)
-
+	includeResourcesToProject(resources, project.file)
+	
 	print('\nRESOURCE DIRECTORIES COPIED\n')
