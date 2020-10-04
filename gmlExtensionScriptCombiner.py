@@ -5,7 +5,7 @@ import utilities as utils
 validParamTags = ['@param', '@arg', '@argument']
 
 def makeScriptFilePath(scriptDir):
-	dirName = os.path.basename(scriptDir)
+	dirName = utils.getFileName(scriptDir, True)
 	script = os.path.join(scriptDir, dirName) + '.gml'
 	return script
 

@@ -1,3 +1,42 @@
+from os.path import basename
+from utilities import getFileName
+
+def folderJson(path, name):
+	json = {
+		"folderPath": path, #NOTE e.g. "folders/Scripts/Math.yy"
+		"order": 0,
+		"resourceVersion": "1.0",
+		"name": name,
+		"tags": [],
+		"resourceType": "GMFolder"
+	}
+	return json
+
+def resourceParentJson():
+	json = {
+		'name': 'Scripts',
+		'path': 'folders/Scripts.yy',
+	}
+	return json
+
+def resourceRelativePath(resourcesName, resourceName):
+	path = resourcesName + '/' + resourceName + '/' + resourceName + '.yy'
+	return path
+
+def resourceJson(path):
+	#NOTE Path should be resources/resName/resName.yy
+	#e.g. extensions/Asset/Asset.yy
+
+	json = {
+		'id': {
+			'name': getFileName(path, True),
+			'path': path
+		},
+		'order': 0
+	}
+
+	return json
+
 def extensionYYJSON(extensionName):
 	extensionYY = {
 		'optionsFile': 'options.json',

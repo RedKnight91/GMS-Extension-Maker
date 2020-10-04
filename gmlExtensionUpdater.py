@@ -15,21 +15,22 @@ def listProjectDirectories(projectsDir):
 
 	return projectDirs
 
-def projectUsesExtension(project, extensionName):
-	projectExtensionPath = project + r'\extensions\{}'.format(extensionName)
+def projectUsesExtension(projectDir, extensionName):
+	projectExtensionPath = projectDir + r'\extensions\{}'.format(extensionName)
 	hasMatchingExtensionDir = (os.path.exists(projectExtensionPath))
 
 	if (hasMatchingExtensionDir):
-		print('Project match: {}'.format(project))
+		name = os.path.basename(projectDir)
+		print('Project match: {}'.format(name))
 
 	return hasMatchingExtensionDir
 
-def listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName):
+def listProjectsUsingExtension(projectsDir, assetProjectDir, extensionName):
 	projectDirs = utils.getDirectoriesContainingFileType(projectsDir, 'yyp')
 	matchingProjects = []
 
 	for dir in projectDirs:
-		isSameProject = (dir == extensionProjectDir)
+		isSameProject = (dir == assetProjectDir)
 		usesExtension = projectUsesExtension(dir, extensionName)
 
 		if (usesExtension and not isSameProject):
@@ -50,7 +51,7 @@ def confirmProjectUpdate(dir):
 	prompt = 'Update this project? (Y/N) {}'.format(dir)
 	return utils.promptChoice(prompt)
 
-def copyResourcesToProject(workPaths, project, scriptDirs, objectDirs, extensionDirs):
+def updateResourcesToProject(workPaths, project, scriptDirs, objectDirs, extensionDirs):
 	copier.copyScriptsToProject(workPaths, project, scriptDirs)
 	copier.copyObjectsToProject(workPaths, project, objectDirs)
 	copier.copyExtensionsToProject(workPaths, project, extensionDirs)
@@ -59,26 +60,26 @@ def updateExtensionToProjects(workPaths):
 	print('\nPUSHING EXTENSION\n')
 
 	projectsDir = workPaths.projectsDir
-	extensionProjectDir = workPaths.extensionProject.dir
-	extensionName = workPaths.extension.name
+	assetProjectDir = workPaths.assetProject.dir
+	assetProjectName = workPaths.assetProject.name
 
-	print('\n[1/3] Looking for projects using {} extension'.format(extensionName))
-	projectsUsingExt = listProjectsUsingExtension(projectsDir, extensionProjectDir, extensionName)
+	print('\n[1/3] Looking for projects using {} extension'.format(assetProjectName))
+	projectsUsingExt = listProjectsUsingExtension(projectsDir, assetProjectDir, assetProjectName)
 
 	if not projectsUsingExt:
 		print('\n[2/3] No projects found')
-		exit
+		return
 
 	print('\n[2/3] Retrieving extension files\n')
-	sourceScriptDirs= locator.locateScripts(workPaths)
-	sourceObjectDirs= locator.locateObjects(workPaths)
-	sourceExtensionDirs	= locator.locateExtensions(workPaths)
+	assetScriptDirs= locator.locateScripts(workPaths)
+	assetObjectDirs= locator.locateObjects(workPaths)
+	assetExtensionDirs	= locator.locateExtensions(workPaths)
 
 	print('\n[3/3] Pushing extension to projects')
 	updateAll = promptExtensionUpdateAll()
 
 	for project in projectsUsingExt:
 		if (updateAll or confirmProjectUpdate(project)):
-			copyResourcesToProject(workPaths, project, sourceScriptDirs, sourceObjectDirs, sourceExtensionDirs)
+			updateResourcesToProject(workPaths, project, assetScriptDirs, assetObjectDirs, assetExtensionDirs)
 
 	print('\nUPDATE COMPLETED\n')

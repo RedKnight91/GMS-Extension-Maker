@@ -3,14 +3,10 @@ from gmsUtilities import Project, File
 
 def printWorkPaths(workPaths):
 	print('WORK PATHS:\n')
-	print('Source Project:\n', workPaths.sourceProject, '\n')
-	print('Extension Project:\n', workPaths.extensionProject, '\n')
-	print('Extension:\n', workPaths.extension, '\n')
-	print('Extension Functions:\n', workPaths.extension.functions, '\n')
+	print('Source Project:\n', workPaths.assetProject, '\n')
 	print('Combined Functions:\n', workPaths.combinedScripts, '\n')
-	print('Combined Jsdocs:\n', workPaths.combinedJsdocs, '\n')
-	print('External Group:\n', workPaths.externalScriptsGroup, '\n')
-	print('Internal Group:\n', workPaths.internalScriptsGroup, '\n')
+	print('Asset Scripts Group:\n', workPaths.assetScriptsGroup, '\n')
+	print('Asset Objects Group:\n', workPaths.assetObjectsGroup, '\n')
 
 
 def validateFile(file):
@@ -18,8 +14,6 @@ def validateFile(file):
 
 
 def validateWorkPaths(workPaths):
-	validateFile(workPaths.sourceProject)
-	validateFile(workPaths.extensionProject)
-	validateFile(workPaths.extension)
+	validateFile(workPaths.assetProject)
 
 	return workPaths

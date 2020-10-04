@@ -7,23 +7,16 @@ import utilities as utils
 
 debugMode = False
 
-def printHeader(workPaths):
-	extensionName = workPaths.extension.name
-	extensionProjectName = workPaths.extensionProject.name
-	sourceProjectName = workPaths.sourceProject.name
-	print('Making extension "{}" in project {}, combining project {}'.format(extensionName, extensionProjectName, sourceProjectName))
-
-
 def makeExtension(workPaths):
-	printHeader(workPaths)
-
 	validateWorkPaths(workPaths)
 	if debugMode:
 		printWorkPaths(workPaths)
 	
 	generateAssetExtension(workPaths)
 
-	sourceScriptDirs = locator.locateScripts(workPaths)
-	combineScripts(workPaths, sourceScriptDirs)
+	assetScriptDirs = locator.locateScripts(workPaths)
+	combineScripts(workPaths, assetScriptDirs)
 
 	updateExtensionToProjects(workPaths)
+
+	#TODO delete combined files in 'results' dir

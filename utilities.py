@@ -3,6 +3,7 @@ import glob
 import shutil
 import json
 import uuid
+from jsoncomment import JsonComment
 
 def makePath(dir, name, extension):
 	path = os.path.join(dir, name) + '.' + extension
@@ -234,7 +235,7 @@ def writeFile(filePath, content):
 
 def readJson(filePath):
 	with open(filePath, 'r') as file:
-		content = json.load(file)
+		content = JsonComment().load(file)
 
 	return content
 

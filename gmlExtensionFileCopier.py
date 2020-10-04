@@ -1,18 +1,20 @@
 import utilities as utils
-from gmsUtilities import includeResourcesToProject
+from gmsUtilities import includeResourcesToYyp
 import os
 
-def copyScriptFileToExtension(workPaths, scriptDirs):
-	print('\nCOPYING SCRIPT FILES TO EXTENSION\n')
+def fixResourceRelativePaths(resourcesType, assetName, resourcesDir):
+	resourceYYs = utils.getDirectoryExtensionFilesRecursive(resourcesDir, 'yy')
 
-	extensionDir = workPaths.extension.dir
+	for resYY in resourceYYs:
+		resJson = utils.readJson(resYY)
 
-	for dir in scriptDirs:
-		script = utils.getDirectoryExtensionFiles(dir, 'gml')
-		utils.replaceFilesToDir(script, extensionDir)
+		path = resJson['parent']['path']
+		path = resourcesType + '/' + assetName + '.yy'
+		resJson['parent']['path'] = path
 
-	print('\nFUNCTIONS FILE COPIED\n')
+		utils.writeJson(resYY, resJson)
 
+	return
 
 def ensureResourceDirExists(project, resourceDir):
 	if (not os.path.exists(resourceDir)):
@@ -21,19 +23,29 @@ def ensureResourceDirExists(project, resourceDir):
 		os.mkdir(resourceDir)
 
 def copyScriptsToProject(workPaths, project, scriptDirs):
-	copyResourcesToProject(workPaths, project, project.scriptsDir, scriptDirs)
+	copyResourcesToProject(workPaths, project, 'scripts', project.scriptsDir, scriptDirs)
 
 def copyObjectsToProject(workPaths, project, objectDirs):
-	copyResourcesToProject(workPaths, project, project.objectsDir, objectDirs)
+	copyResourcesToProject(workPaths, project, 'objects', project.objectsDir, objectDirs)
 
 def copyExtensionsToProject(workPaths, project, extensionDirs):
-	copyResourcesToProject(workPaths, project, project.extensionsDir, extensionDirs)
+	copyResourcesToProject(workPaths, project, 'extensions', project.extensionsDir, extensionDirs)
 
-def copyResourcesToProject(workPaths, project, resourceDir, resources):
+def copyResourcesToProject(workPaths, project, resourcesType, resourcesDir, resourceDirs):
 	print('\nCOPYING EXTERNAL RESOURCES\n')
 
-	ensureResourceDirExists(project, resourceDir)
-	utils.replaceDirectoriesToDir(resources, resourceDir)
-	includeResourcesToProject(resources, project.file)
+	#TODO
+	#1. copy resource dirs over to project
+	#2. fix their paths (earlier folders/Scripts/Asset.yy or whatever)
+	#3. ensure paths exist in project's 'Folders' node
+	#4. include resources to project's 'resources' node
+
+	resourceNames = [utils.getFileName(res, True) for res in resourceDirs]
+
+	ensureResourceDirExists(project, resourcesDir)
+	utils.replaceDirectoriesToDir(resourceDirs, resourcesDir)
+	fixResourceRelativePaths(resourcesType, workPaths.assetProject.name, resourcesDir)
+
+	includeResourcesToYyp(resourcesType, resourceNames, project.file)
 	
 	print('\nRESOURCE DIRECTORIES COPIED\n')

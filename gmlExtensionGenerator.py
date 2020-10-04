@@ -1,21 +1,24 @@
 from gmlExtensionUpdater import projectUsesExtension
-from jsonModels import extensionYYJSON
+from models import extensionYYJSON
 import utilities as utils
 import os
+from gmsUtilities import includeResourcesToYyp
 
 def generateAssetExtension(workPaths):
-	project = workPaths.sourceProject
-	extName = workPaths.sourceProject.name
+	project = workPaths.assetProject
+	extName = workPaths.assetProject.name
 
-	extensionExists = projectUsesExtension(project, extName)
+	extensionExists = projectUsesExtension(project.dir, extName)
 
 	if extensionExists:
-		exit
+		return
 
 	extDir = os.path.join(project.extensionsDir, extName)
 	extFile = extName + '.yy'
 	extPath = os.path.join(extDir, extFile)
 
-	os.mkdir(extDir)
+	os.makedirs(extDir, exist_ok=True)
 	extJson = extensionYYJSON(extName)
 	utils.writeJson(extPath, extJson)
+
+	includeResourcesToYyp('extensions', [extName], project.file)

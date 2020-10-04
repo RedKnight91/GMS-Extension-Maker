@@ -1,5 +1,6 @@
 import utilities as utils
-from os.path import join, basename, normpath
+from models import folderJson, resourceJson, resourceRelativePath
+from os.path import join, basename, normpath, split
 
 class File:
 	def __init__(self, name, dir, extension):
@@ -24,45 +25,35 @@ class Project(File):
 		return output + 'scriptsDir: {},\nobjectsDir: {},\nextensionsDir: {}'.format(self.scriptsDir, self.objectsDir, self.extensionsDir)
 
 class ProductionPaths():
-	def __init__(self, projectsDir, sourceProjectDir, extensionName, combinedDir, externalScriptsGroup, internalScriptsGroup, externalObjectsGroup):
+	def __init__(self, projectsDir, assetProjectDir, combinedDir, assetScriptsGroup, assetObjectsGroup):
 		self.projectsDir		= normpath(projectsDir)
 
-		sourceProjectName		= basename(sourceProjectDir)
-		self.sourceProject		= Project(sourceProjectName, sourceProjectDir)
+		assetProjectName		= basename(assetProjectDir)
+		self.assetProject		= Project(assetProjectName, assetProjectDir)
 
-		# extensionProjectName	= basename(extensionProjectDir)
-		# self.extensionProject	= Project(extensionProjectName, extensionProjectDir)
+		self.combinedDir		= join(normpath(combinedDir), assetProjectName)
+		combinedFileName		= assetProjectName + 'ScriptsCombined'
 
-		self.combinedDir		= join(normpath(combinedDir), sourceProjectName)
-		functionsName			= sourceProjectName + '_functions'
+		self.combinedScripts	= File(combinedFileName, combinedDir, 'gml')
 
-		# extensionDir			= join(self.extensionProject.extensionsDir, extensionName)
-		# self.extension			= File(extensionName, extensionDir, 'yy')
-		# self.extension.functions= File(functionsName, extensionDir, 'gml')
+		self.assetScriptsGroup	= assetScriptsGroup
+		self.assetObjectsGroup	= assetObjectsGroup
 
-		self.combinedScripts	= File(functionsName, combinedDir, 'gml')
-		self.combinedJsdocs		= File('jsdocs', combinedDir, 'gml')
+def splitPathIntoParts(path):
+	allparts = []
+	while True:
+		parts = os.path.split(path)
+		if parts[0] == path:
+			allparts.insert(0, parts[0])
+			break
+		elif parts[1] == path:
+			allparts.insert(0, parts[1])
+			break
+		else:
+			path = parts[0]
+			allparts.insert(0, parts[1])
 
-		self.externalScriptsGroup	= externalScriptsGroup
-		self.internalScriptsGroup	= internalScriptsGroup
-
-		self.externalObjectsGroup	= externalObjectsGroup
-
-def createResourceJson(path):
-	# name = basename(path)
-	# dir = utils.removeExtension(path)
-	# yyPath = join(dir, name) + '.yy'
-
-	#TODO check that the path is correct (e.g. scripts/doThing/doThing.yy)
-	json = {
-		'id': {
-			'name': basename(path),
-			'path': path
-		},
-		'order': 0
-	}
-
-	return json
+	return allparts
 
 def makeResourcePath(projectDir, partialResourcePath):
 	path = join(projectDir, partialResourcePath)
@@ -73,29 +64,44 @@ def makeResourceDirPath(projectDir, partialResourcePath):
 	dirPath = utils.getDir(fullPath)
 	return dirPath
 
-# def isResourceInProjectFile(name, projectJson):
-# 	resources = projectJson['resources']
+def yypHasFolder(foldersJson, folderPath):
+	folder = [f for f in foldersJson if f['folderPath'] == folderPath ]
+	return folder
 
-# 	for resource in resources:
-# 		path = resource['Value']['resourcePath']
-# 		type = resource['Value']['resourceType']
+def includeFolderToYyp(folderPath, projectFolders):
+	folderName = split(folderPath)[1]
+	folder = folderJson(folderPath, folderName)
+	projectFolders.append(folder)
 
-# 		if (resourceType == type and name in path):
-# 			return True
-	
-# 	return False
+def includeResourceFoldersToYyp(resourcesName, resourceName, projectJson):
+	folders = projectJson['Folders']
 
-def includeResourceToProject(resPath, projectJson):
-	json = createResourceJson(resPath)
+	#TODO
+	path = 'folders/' + resourcesName + '/' + assetName + '/' + relPath + '.yy'
+	pathLen = splitPathIntoParts(path)
+
+	for _ in (pathLen - 1):
+		exists = yypHasFolder(folders, path)
+
+		if not exists:
+			includeFolderToYyp(path, folders)
+		
+		path = split(path)[0] + '.yy'
+
+	return
+
+def includeResourceToYyp(resourcesName, resourceName, projectJson):
+	path = resourceRelativePath(resourcesName, resourceName)
+	json = resourceJson(path)
 	projectJson['resources'].append(json)
+	includeResourceFoldersToYyp(resourcesName, resourceName, projectJson)
 
-def includeResourcesToProject(resourcePaths, projectFile):
+	#TODO is the above enough to actually get it written to json?
+
+def includeResourcesToYyp(resourcesTypeName, resourceNames, projectFile):
 	projectJson = utils.readJson(projectFile)
 
-	for path in resourcePaths:
-		# TODO Is this check necessary?
-		# name = basename(path)
-		# if (not isResourceInProjectFile(name, projectJson)):
-		includeResourceToProject(path, projectJson)
+	for name in resourceNames:
+		includeResourceToYyp(resourcesTypeName, name, projectJson)
 			
 	utils.writeJson(projectFile, projectJson)
