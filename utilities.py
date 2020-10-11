@@ -5,15 +5,17 @@ import json
 import uuid
 from jsoncomment import JsonComment
 
+#Creates a file path
 def makePath(dir, name, extension):
 	path = os.path.join(dir, name) + '.' + extension
 	return path
 
-
+#Creates a list of file paths in the same dir
 def makePathList(dir, names, extension):
 	paths = [makePath(dir, name, extension) for name in names]
 	return paths
 
+#Gets file names from paths
 def extractFileNames(paths, excludeExtension):
 	names = []
 
@@ -32,7 +34,7 @@ def removeExtension(name):
 	name = os.path.splitext(name)[0]
 	return name
 
-def getDirectoryFiles(path):
+def getDirFiles(path):
 	fileList = []
 	dirContent = next(os.walk(path))
 	root = dirContent[0]
@@ -43,7 +45,7 @@ def getDirectoryFiles(path):
 
 	return fileList
 
-def getDirectoryExtensionFiles(path, extension):
+def getDirExtensionFiles(path, extension):
 	fileList = []
 	dirContent = next(os.walk(path))
 	root = dirContent[0]
@@ -56,7 +58,7 @@ def getDirectoryExtensionFiles(path, extension):
 	return fileList
 
 
-def getDirectoryFilesRecursive(path):
+def getDirFilesRecursive(path):
 	fileList = []
 	for root, _, files in os.walk(path):
 		for file in files:
@@ -64,7 +66,7 @@ def getDirectoryFilesRecursive(path):
 
 	return fileList
 
-def getDirectoryExtensionFilesRecursive(path, extension):
+def getDirExtensionFilesRecursive(path, extension):
 	fileList = []
 	for root, _, files in os.walk(path):
 		for file in files:
@@ -142,7 +144,7 @@ def getMatchingFile(files, extension):
 
 
 def dirContainsFileType(dir, extension):
-	files = getDirectoryFiles(dir)
+	files = getDirFiles(dir)
 
 	for file in files:
 		if (fileMatchesExtension(file, extension)):
@@ -159,7 +161,7 @@ def dirContainsFileTypeRecursive(dir, extension):
 	return False
 
 
-def deleteDirectoryFiles(dir):
+def deleteDirFiles(dir):
 	for child in os.listdir(dir):
 		childPath = os.path.join(dir, child)
 		os.remove(childPath)
@@ -192,7 +194,7 @@ def replaceFilesToDir(files, dir):
 		shutil.copy(file, dir)
 
 def replaceDirFiles(dir, files):
-	deleteDirectoryFiles(dir)
+	deleteDirFiles(dir)
 	copyFilesToDir(files, dir)
 
 def getFileName(path, _removeExtension):
@@ -215,7 +217,7 @@ def getParentDir(path):
 	parentDir = os.path.split(path)[0] #remove last dir
 	return parentDir
 
-def getDirectory(path):
+def getDir(path):
 	path = os.path.dirname(path)
 	return dir
 
@@ -274,6 +276,26 @@ def getMatchingJsonObject(jsonObjects, key, value):
 
 	return None
 
+#Splits a path into a list of its dirs (and file)
+def splitPath(path):
+    path = os.path.normpath(path)
+    parts = []
+
+    while True:
+        head, tail = os.path.split(path)
+        if head == path:  # sentinel for absolute paths
+            parts.insert(0, head)
+            break
+        elif tail == path: # sentinel for relative paths
+            parts.insert(0, tail)
+            break
+        else:
+            path = head
+            parts.insert(0, tail)
+
+    return parts
+
+#Splits a path into a list of its dirs, excluding the file at the end
 def splitPathDirs(path):
     path = os.path.normpath(path)
     dirs = []
@@ -298,24 +320,6 @@ def splitPathDirs(path):
             dirs.insert(0, tail)
 
     return dirs
-
-def splitPath(path):
-    path = os.path.normpath(path)
-    parts = []
-
-    while True:
-        head, tail = os.path.split(path)
-        if head == path:  # sentinel for absolute paths
-            parts.insert(0, head)
-            break
-        elif tail == path: # sentinel for relative paths
-            parts.insert(0, tail)
-            break
-        else:
-            path = head
-            parts.insert(0, tail)
-
-    return parts
 
 
 def valueInDicts(dictList, value):

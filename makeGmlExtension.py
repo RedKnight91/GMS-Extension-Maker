@@ -1,8 +1,5 @@
-from gmlExtensionMaker import makeExtension
-from workPaths import Projects
+import paths
+paths.initTest()
 
-# makeExtension(Projects.GMS_utilities)
-# makeExtension(Projects.GMS_events)
-# makeExtension(Projects.GMS_timers)
-# makeExtension(Projects.GMS_camera)
-makeExtension(Projects.Test)
+from assetMaker import makeExtension
+makeExtension()
