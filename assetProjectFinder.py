@@ -1,6 +1,5 @@
 from os.path import exists
-from workPaths import workPaths
-from classes import makeProjectFromDir
+from workPaths import workPaths, makeProjectFromDir
 import utilities as utils
 
 def projectUsesAsset(dir, extensionName):

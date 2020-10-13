@@ -17,9 +17,10 @@ def makeExtension():
 
 	userProjects = listProjectsUsingAsset()
 
-	updateAll = promptPushToAll()
+	# updateAll = promptPushToAll()
 	for project in userProjects:
-		if (updateAll or promptPushToProject(project)):
+		if True:
+		# if (updateAll or promptPushToProject(project)):
 			deleteResourcesFromProject(project)
 			excludeAssetResourcesFromProject(project)
 			copyResourcesToProject(project)

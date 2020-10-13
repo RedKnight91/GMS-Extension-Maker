@@ -3,8 +3,7 @@ from models import extensionYYJSON
 import utilities as utils
 import os
 from assetResourceIncluder import includeResourceTypeToProject
-from workPaths import workPaths
-from classes import File
+from workPaths import workPaths, File
 
 def generateAssetExtension():
 	project = workPaths.assetProject

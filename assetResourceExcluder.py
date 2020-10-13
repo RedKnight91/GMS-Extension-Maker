@@ -15,7 +15,7 @@ def excludeResourceFoldersFromProject(type, projectJson):
 
 def resourceFileExists(resourcesDir, project, resource):
 	resPath = resource['id']['path']
-	path = dirname(resourcesDir) + resPath
+	path = join(dirname(resourcesDir), resPath)
 
 	return exists(path)
 
