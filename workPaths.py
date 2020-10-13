@@ -32,9 +32,14 @@ class Project(File):
 		self.objectsDir		= join(dir, 'objects')
 		self.extensionsDir	= join(dir, 'extensions')
 
-		self.scripts = [Resource(script, 'script') for script in self.findScripts(self, assetName)]
-		self.objects = [Resource(object, 'object') for object in self.findObjects(self, assetName)]
-		self.extensions = [Resource(extension, 'extension') for extension in self.findExtensions(self, assetName)]
+		self.scripts = [Resource(script, 'script') for script in self.findScripts('')]
+		self.objects = [Resource(object, 'object') for object in self.findObjects('')]
+		self.extensions = [Resource(extension, 'extension') for extension in self.findExtensions('')]
+
+		assetBranchTail = '/' + assetName
+		self.assetScripts = [Resource(script, 'script') for script in self.findScripts(assetBranchTail)]
+		self.assetObjects = [Resource(object, 'object') for object in self.findObjects(assetBranchTail)]
+		self.assetExtensions = [Resource(extension, 'extension') for extension in self.findExtensions(assetBranchTail)]
 
 	def __str__(self):
 		output = File.__str__(self)
@@ -42,19 +47,16 @@ class Project(File):
 
 	#TODO 'Scripts' and 'Objects' should not be fixed in here, as resource folders can now be renamed
 
-	def findScripts(self, project, assetName):
-		branch = 'folders/Scripts/{}'.format(assetName)
-		scripts = self.findResourceType(project, branch, project.scriptsDir)
+	def findScripts(self, branchTail):
+		scripts = self.findResourceType('Scripts', branchTail, self.scriptsDir)
 		return scripts
 
-	def findObjects(self, project, assetName):
-		branch = 'folders/Objects/{}'.format(assetName)
-		objects = self.findResourceType(project, branch, project.objectsDir)
+	def findObjects(self, branchTail):
+		objects = self.findResourceType('Objects', branchTail, self.objectsDir)
 		return objects
 
-	def findExtensions(self, project, assetName):
-		branch = 'folders/Extensions/{}'.format(assetName)
-		extensions = self.findResourceType(project, branch, project.extensionsDir)
+	def findExtensions(self, branchTail):
+		extensions = self.findResourceType('Extensions', branchTail, self.extensionsDir)
 		return extensions
 
 	def validResource(self, resourcesJson, resource, branch):
@@ -66,13 +68,14 @@ class Project(File):
 		return valid
 
 	
-	def findResourceType(self, project, branch, resourcesDir):
+	def findResourceType(self, type, branchTail, resourcesDir):
 		print('\nLOCATING RESOURCES\n')
 
-		projectJson = utils.readJson(project.file)
+		projectJson = utils.readJson(self.file)
 		resourcesJson = projectJson['resources']
 		resources = utils.getDirExtensionFilesRecursive(resourcesDir, '.yy')
 
+		branch = 'folders/' + type + branchTail
 		okResources = [res for res in resources if self.validResource(resourcesJson, res, branch)]
 
 		print('\nRESOURCES LOCATED\n')

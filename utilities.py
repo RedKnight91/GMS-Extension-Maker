@@ -204,10 +204,6 @@ def getFileName(path, _removeExtension):
 
 	return name
 
-def getDir(path):
-	dir = os.path.dirname(path)
-	return dir
-
 def getDirName(path):
 	name = os.path.basename(path)
 	return name
