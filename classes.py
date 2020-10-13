@@ -2,6 +2,7 @@ from os.path import normpath, basename, dirname, join
 import utilities as utils
 from assetResourceFinder import findScripts, findObjects, findExtensions
 
+
 class File:
 	def __init__(self, name, dir, extension):
 		self.name	= name
@@ -20,7 +21,7 @@ class Resource(File):
 		File.__init__(self, name, dir, 'yy')
 
 class Project(File):
-	def __init__(self, name, dir):
+	def __init__(self, name, dir, assetName):
 		dir = normpath(dir)
 
 		File.__init__(self, name, dir, 'yyp')
@@ -33,25 +34,25 @@ class Project(File):
 		self.objectsDir		= join(dir, 'objects')
 		self.extensionsDir	= join(dir, 'extensions')
 
-		self.scripts = [Resource(script, 'script') for script in findScripts(self)]
-		self.objects = [Resource(object, 'object') for object in findObjects(self)]
-		self.extensions = [Resource(extension, 'extension') for extension in findExtensions(self)]
+		self.scripts = [Resource(script, 'script') for script in findScripts(self, assetName)]
+		self.objects = [Resource(object, 'object') for object in findObjects(self, assetName)]
+		self.extensions = [Resource(extension, 'extension') for extension in findExtensions(self, assetName)]
 
 	def __str__(self):
 		output = File.__str__(self)
 		return output + 'scriptsDir: {},\nobjectsDir: {},\nextensionsDir: {}'.format(self.scriptsDir, self.objectsDir, self.extensionsDir)
 
 
-class ProductionPaths():
-	def __init__(self, projectsDir, assetProjectDir, combinedDir):
-		assetProjectName = basename(assetProjectDir)
+class WorkPaths():
+	def __init__(self, projectsDir, assetProjectDir):
+		assetName = basename(assetProjectDir)
 
 		self.projectsDir	= normpath(projectsDir)
-		self.assetProject	= Project(assetProjectName, assetProjectDir)
+		self.assetProject	= Project(assetName, assetProjectDir, assetName)
 
-def makeProjectFromDir(dir):
+def makeProjectFromDir(dir, assetName):
 	yypFile = utils.getDirExtensionFiles(dir, 'yyp')[0]
 	name = utils.getFileName(yypFile, True)
-	project = Project(name, dir)
+	project = Project(name, dir, assetName)
 
 	return project

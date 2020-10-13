@@ -1,5 +1,5 @@
 from os.path import exists
-from paths import workPaths
+from workPaths import workPaths
 from classes import makeProjectFromDir
 import utilities as utils
 
@@ -20,6 +20,7 @@ def validProject(dir):
 
 def listProjectsUsingAsset():
 	projectDirs = utils.getDirectoriesContainingFileType(workPaths.projectsDir, 'yyp')
-	matches = [makeProjectFromDir(dir) for dir in projectDirs if validProject(dir)]
+	assetName = workPaths.assetProject.name
+	matches = [makeProjectFromDir(dir, assetName) for dir in projectDirs if validProject(dir)]
 
 	return matches

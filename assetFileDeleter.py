@@ -1,5 +1,5 @@
 import utilities as utils
-from paths import workPaths
+from workPaths import workPaths
 from os.path import exists
 from os import mkdir
 import shutil

@@ -2,8 +2,8 @@ from assetProjectFinder import projectUsesAsset
 from models import extensionYYJSON
 import utilities as utils
 import os
-from gmUtilities import includeResourceTypeToProject
-from paths import workPaths
+from assetResourceIncluder import includeResourceTypeToProject
+from workPaths import workPaths
 from classes import File
 
 def generateAssetExtension():

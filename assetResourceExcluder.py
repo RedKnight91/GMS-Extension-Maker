@@ -1,45 +1,7 @@
 import utilities as utils
 from models import folderJson, resourceJson, resourceRelativePath
 from os.path import join, basename, dirname, normpath, split, exists
-from paths import workPaths
-
-
-# def yypHasFolder(foldersJson, folderPath):
-# 	folder = [f for f in foldersJson if f['folderPath'] == folderPath ]
-# 	return folder
-
-# def excludeFolderFromProject(folderPath, projectFolders):
-# 	folderName = utils.getFileName(folderPath, True)
-# 	folder = folderJson(folderPath, folderName)
-# 	projectFolders.append(folder)
-
-# def excludeResourceFoldersFromProject(parentPath, resourceName, projectJson):
-# 	folders = projectJson['Folders']
-# 	pathLen = len(utils.splitPath(parentPath))
-
-# 	for _ in range(pathLen - 1):
-# 		if not yypHasFolder(folders, parentPath):
-# 			excludeFolderFromProject(parentPath, folders)
-		
-# 		parentPath = split(parentPath)[0] + '.yy'
-
-# def appendResourceToResources(projectJson, path):
-# 	json = resourceJson(path)
-# 	projectJson['resources'].append(json)
-
-
-# def excludeResourceFromProject(type, resource, projectJson):
-
-	# name = resource.name
-	# file = resource.file
-	# yyJson = utils.readJson(file)
-	# parentPath = yyJson['parent']['path']
-
-	# path = resourceRelativePath(type, name) #e.g. scripts/doThing/doThing.yy
-	
-	# if not resourceInProject(projectJson, path):
-	# 	appendResourceToResources(projectJson, path)
-	# 	excludeResourceFoldersFromProject(parentPath, name, projectJson)
+from workPaths import workPaths
 
 def excludeResourceFoldersFromProject(type, projectJson):
 	assetName = workPaths.assetProject.name

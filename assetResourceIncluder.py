@@ -1,7 +1,7 @@
 import utilities as utils
 from models import folderJson, resourceJson, resourceRelativePath
 from os.path import join, basename, normpath, split
-from paths import workPaths
+from workPaths import workPaths
 
 
 def yypHasFolder(foldersJson, folderPath):
