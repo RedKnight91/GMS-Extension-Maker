@@ -15,7 +15,7 @@ def generateAssetExtension():
 		return
 
 	dir = os.path.join(project.extensionsDir, name)
-	extension = File(name, dir, '.yy')
+	extension = File(name, dir, 'yy')
 
 	os.makedirs(dir, exist_ok=True)
 	extJson = extensionYYJSON(name)

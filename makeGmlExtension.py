@@ -1,5 +1,5 @@
 import initPaths
-paths = initPaths.initTest()
+paths = initPaths.initGMS_utilities()
 
 import workPaths
 workPaths.initWorkPaths(paths)

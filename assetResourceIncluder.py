@@ -55,6 +55,6 @@ def includeResourceTypeToProject(resourcesType, resources, project):
 
 def includeAssetResourcesToProject(project):
 	asset = workPaths.assetProject
-	includeResourceTypeToProject('scripts', asset.scripts, project)
-	includeResourceTypeToProject('objects', asset.objects, project)
-	includeResourceTypeToProject('extensions', asset.extensions, project)
+	includeResourceTypeToProject('scripts', asset.assetScripts, project)
+	includeResourceTypeToProject('objects', asset.assetObjects, project)
+	includeResourceTypeToProject('extensions', asset.assetExtensions, project)

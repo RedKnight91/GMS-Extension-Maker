@@ -69,16 +69,12 @@ class Project(File):
 
 	
 	def findResourceType(self, type, branchTail, resourcesDir):
-		print('\nLOCATING RESOURCES\n')
-
 		projectJson = utils.readJson(self.file)
 		resourcesJson = projectJson['resources']
 		resources = utils.getDirExtensionFilesRecursive(resourcesDir, '.yy')
 
 		branch = 'folders/' + type + branchTail
 		okResources = [res for res in resources if self.validResource(resourcesJson, res, branch)]
-
-		print('\nRESOURCES LOCATED\n')
 
 		return okResources
 

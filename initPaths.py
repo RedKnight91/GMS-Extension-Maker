@@ -12,35 +12,35 @@ def initTest():
 def initGMS_utilities():
 	paths = {
 		'projectsDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2'),
-		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_utilities\GMS_utilities')
+		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_utilities')
 	}
 	return paths
 
 def initGMS_timers(): 
 	paths = {
 		'projectsDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2'),
-		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_timers\GMS_timers')
+		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_timers')
 	}
 	return paths
 
 def initGMS_verlet(): 
 	paths = {
 		'projectsDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2'),
-		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_timers\GMS_verlet')
+		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_verlet')
 	}
 	return paths
 
 def initGMS_events(): 
 	paths = {
 		'projectsDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2'),
-		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_timers\GMS_events')
+		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_events\GMS_events')
 	}
 	return paths
 
 def initGMS_camera(): 
 	paths = {
 		'projectsDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2'),
-		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_camera\GMS_camera')
+		'assetProjectDir' : normpath(r'C:\Users\mikec\Documents\GameMakerStudio2\Assets\GMS_camera')
 	}
 	return paths
 		

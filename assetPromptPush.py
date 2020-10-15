@@ -5,6 +5,6 @@ def promptPushToAll():
 	updateAll = utils.promptChoice(prompt)
 	return updateAll
 
-def promptPushToProject(dir):
-	prompt = 'Push to {} project? (y/n)'.format(dir)
+def promptPushToProject(project):
+	prompt = 'Push to {} project? (y/n)'.format(project.name)
 	return utils.promptChoice(prompt)
